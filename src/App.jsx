@@ -16,7 +16,7 @@ function App() {
           <Route path="/" element={<Home />} />
         </Route>
 
-        {/* Layout بدون Navbar و Footer */}
+        {/* دول لوحدهم */}
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
