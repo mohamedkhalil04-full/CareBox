@@ -5,7 +5,7 @@ const Home=()=>{
 
     return(
         <>
-        
+        <h2>this is the fucken home page</h2>
         </>
     )
 }
