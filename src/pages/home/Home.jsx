@@ -1,13 +1,11 @@
-import './home.css';
+import "./home.css";
 
-const Home=()=>{
-    
-
-    return(
-        <>
-        <h2>this is the fucken home page</h2>
-        </>
-    )
-}
+const Home = () => {
+  return (
+    <>
+      <h1>HELLO FROM HOME</h1>
+    </>
+  );
+};
 
 export default Home;
