@@ -7,7 +7,9 @@ import Login from "./pages/login/login";
 import Register from "./pages/register/register";
 import NotFound from "./pages/NotFound/NotFound";
 import AuthLayout from "./layouts/AuthLayout";
-
+import OTP from "./pages/OTP/otp";
+import CreateNewPass from "./pages/CreateNewPass/CreateNewPass";
+import EditProfile from "./pages/EditProfile/EditProfile";
 function App() {
   return (
     <Router>
@@ -20,6 +22,9 @@ function App() {
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/otp" element={<OTP/>} />
+          <Route path="/createnewpass" element={<CreateNewPass/>}/>
+          <Route path="/editProfile" element={<EditProfile/>} />
         </Route>
 
         {/* صفحة الخطأ */}

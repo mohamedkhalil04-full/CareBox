@@ -8,7 +8,9 @@ const Home = () => {
 
       <NavLink to="/login">login</NavLink>
       <NavLink to="/register">register</NavLink>
-      
+      <NavLink to="/otp">OTP</NavLink>
+      <NavLink to="/createnewpass">Create new password</NavLink>
+      <NavLink to="/editProfile">Edit Profile</NavLink>
     </>
   );
 };
