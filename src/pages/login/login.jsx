@@ -28,7 +28,7 @@ const Login = () => {
   return (
     <div id="back-page">
       <img src={ProjectLogo} className="p-3" alt="logo" width={100} />
-      <div className="carebox-container container mx-auto my-4 rounded w-25 d-flex flex-column">
+      <div className="carebox-container p-5  my-4 rounded w-25 d-flex flex-column">
         {/* <div className="text-start mb-4"></div> */}
         <h2 className="mb-4 pt-3">Welcome back! Glad to see you, Again!</h2>
 
@@ -79,24 +79,28 @@ const Login = () => {
           <div className="text-end mb-4">
             <a
               href="/otp"
-              className="text-decoration-none"
+              className="text-decoration-none text-danger"
               style={{ fontSize: "0.9em" }}
             >
               Forgot Your Password.
             </a>
           </div>
 
-          <button type="submit" className="btn text-danger bg-black w-100 mb-3">
+         <div className="pb-5">
+           <button type="submit" className="btn w-100 p-3 text-danger bg-black w-100 mb-3 ">
             Login
           </button>
+         </div>
         </form>
 
-        <p className="text-center mt-4">
+       <div className="pt-5">
+         <p className="text-center pt-5">
           Don't have an account?{" "}
-          <a className="text-decoration-none" href="/register">
+          <a className="text-decoration-none " href="/register">
             <bold className="text-danger">Register Now</bold>
           </a>
         </p>
+       </div>
       </div>
     </div>
   );
