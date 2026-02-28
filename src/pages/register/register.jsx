@@ -1,5 +1,5 @@
 // import "./register.css";
-// import ProjectLogo from "../../assets/images/proj-logo.png";
+import ProjectLogo from "../../assets/images/proj-logo.png";
 // import { useState } from "react";
 // import { useNavigate } from "react-router-dom";
 // const Register = () => {
@@ -187,7 +187,7 @@
 //                 id="floatingPassword"
 //                 placeholder="Phone Number"
 //                 // isInputNum={true}
-//                 // inputType="tel" 
+//                 // inputType="tel"
 //                 // value={confirm}
 //                 // onChange={(e) => setConfirm(e.target.value)}
 //                 required
@@ -225,7 +225,6 @@
 //               <label htmlFor="floatingInput">share location URL</label>
 //             </div>
 
-
 //             {/* working hours */}
 
 //             <div className="form-floating">
@@ -257,7 +256,6 @@
 //               Optional - suggested size less than 2MB
 //             </small>
 //           </div>
-
 
 //           </div>
 
@@ -471,8 +469,47 @@
 
 
 // Register.jsx
-import { useState } from 'react';
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm, FormProvider } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { Button, ProgressBar, Card, Form } from "react-bootstrap";
+import Step1 from "../../components/register-steps/step1/step1";
+import Step2 from "../../components/register-steps/step2/step2";
+import Step3 from "../../components/register-steps/step3/step3";
+import { div } from "framer-motion/client";
+
+// ─── Validation Schema ────────────────────────────────────────
+const schema = yup
+  .object({
+    // Step 1
+    providerType: yup.string().required("the provider type is required"),
+    name: yup.string().required("the name is required"),
+    phone: yup.string().required("Phone number is required"),
+    Image: yup.mixed().optional("you can add an image here"),
+    // Step 2
+    address: yup.string().required("the Address is required"),
+    //  latitude: yup.number().min(-90, 'خطأ في خط العرض').max(90, 'خطأ في خط العرض').required('الموقع مطلوب'),
+    // longitude: yup.number().min(-180, 'خطأ في خط الطول').max(180, 'خطأ في خط الطول').required('الموقع مطلوب'),
+    location: yup.string().url("رابط غير صحيح").required("رابط الموقع مطلوب"),
+    workingFrom: yup.string().required("opening time is required"),
+    workingTo: yup.string().required("closing time is required"),
+    // Step 3
+    email: yup.string().email("invalid email").required("email is required"),
+    password: yup
+      .string()
+      .min(8, "password must be at least 8 characters")
+      .required("password is required"),
+    confirmPassword: yup
+      .string()
+      .oneOf(
+        [yup.ref("password")],
+        "password and confirmation must match each other"
+      )
+      .required("confirming password is required"),
+  })
+  .required();
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -512,14 +549,29 @@ export default function Register() {
   const [step, setStep] = useState(1);
   const methods = useForm({
     resolver: yupResolver(schema),
+    // defaultValues: {
+    //   location: '',
+    //   latitude: '',
+    //   longitude: ''
+    // },
+    mode: "onChange",
     mode: 'onChange',
     defaultValues: { latitude: '', longitude: '', location: '' }
   });
 
-  const { handleSubmit, trigger, formState: { isValid } } = methods;
+  const {
+    handleSubmit,
+    trigger,
+    formState: { isValid },
+  } = methods;
 
   const nextStep = async () => {
     let fields = [];
+    if (step === 1) fields = ["providerType", "name", "phone", "image"];
+    if (step === 2)
+      fields = ["address", "location", "workingFrom", "workingTo"];
+    if (step === 3) fields = ["email", "password", "confirmPassword"];
+
     if (step === 1) fields = ['providerType', 'name', 'phone'];
     if (step === 2) fields = ['address', 'location', 'workingFrom', 'workingTo'];
     const valid = await trigger(fields);
@@ -527,8 +579,29 @@ export default function Register() {
   };
 
   const onSubmit = async (data) => {
+    // 1. إنشاء FormData
+    const formData = new FormData();
     const formData = new FormData();
 
+    // 2. إضافة كل الحقول العادية (text, select, time, email, password...)
+    formData.append("providerType", data.providerType);
+    formData.append("name", data.name);
+    formData.append("phone", data.phone);
+    formData.append("address", data.address);
+    // formData.append('Latitude', data.latitude || '');
+    // formData.append('Longitude', data.longitude || '');
+    formData.append("location", data.location);
+    formData.append("WorkingHours", `${data.workingFrom} - ${data.workingTo}`);
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+
+    // 3. إضافة الملف (الصورة)
+    if (data.image && data.image[0]) {
+      formData.append("image", data.image[0]); // 'image' هو الـ key اللي الباك إند هيستقبله
+    }
+
+    // اختياري: لو عايز تضيف حاجات إضافية زي token أو user id
+    // formData.append('userId', currentUser.id);
     // 2. التحويل للـ IDs اللي السيرفر طالبها (بناءً على رسالة الخطأ ProviderTypeId)
     const typeId = providerTypeMapping[data.providerType] || 1;
     formData.append('ProviderTypeId', typeId); 
@@ -555,11 +628,69 @@ export default function Register() {
     }
 
     try {
+      // طريقة 1: باستخدام fetch (مدمج في المتصفح - مفيش حاجة إضافية)
+
+      const response = await fetch(
+        "https://careboxapi.runasp.net/api/Auth/register/provider",
+        {
+          method: "POST",
+          body: formData,
+
+          // مهم: متضيفش headers: { 'Content-Type': 'multipart/form-data' } بنفسك
+          // المتصفح هيضيفها تلقائيًا مع boundary صح
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("خطأ من السيرفر:", errorData);
+        alert(`خطأ: ${errorData.message || "مشكلة في التسجيل"}`);
+        return;
+      }
+    try {
       const response = await fetch('http://careboxapi.runasp.net/api/Auth/register/provider', {
         method: 'POST',
         body: formData,
       });
 
+      const result = await response.json();
+      console.log("الرد من السيرفر:", result);
+
+      // احفظ الإيميل أو رقم مؤقت عشان تستخدمه في صفحة الـ OTP
+      localStorage.setItem("pendingEmail", data.email);
+
+      alert("تم إرسال كود التأكيد على الإيميل/التليفون الخاص بك");
+      // redirect لصفحة OTP
+      navigate("/otp");
+    } catch (error) {
+      console.error("خطأ أثناء الإرسال:", error);
+      alert("حصل خطأ أثناء التسجيل، برجاء المحاولة مرة أخرى");
+    }
+
+    // ────────────── أو طريقة 2: باستخدام axios (أكثر شعبية وسهلة) ──────────────
+    // لو مثبت axios (npm install axios)
+
+    // import axios from 'axios';
+
+    // try {
+    //   const response = await axios.post(
+    //     'https://api.yourdomain.com/api/register-provider',
+    //     formData,
+    //     {
+    //       headers: {
+    //         'Content-Type': 'multipart/form-data',
+    //       },
+    //     }
+    //   );
+    //   console.log('نجاح:', response.data);
+    //   alert('تم التسجيل بنجاح!');
+    // } catch (error) {
+    //   console.error('خطأ:', error.response?.data || error.message);
+    //   alert('حصل خطأ، حاول تاني');
+    // }
+  };
+
+  const progress = (step / 3) * 100;
       const result = await response.json();
 
       if (response.ok) {
@@ -577,6 +708,67 @@ export default function Register() {
   };
 
   return (
+    // العب هنا براحتك و انت بتغير التصميم
+    <div id="back-page">
+      <img src={ProjectLogo} className="p-3" alt="logo" width={100} />
+
+      <div className=" p-5 ">
+        <div className="row ">
+          <div className="col-md-8 col-lg-4">
+            <Card className="shadow">
+              <Card.Body className="p-4">
+                <h3 className="text-center mb-4">
+                  Hello! Register to get started
+                </h3>
+
+                {/* <ProgressBar now={progress} label={`${step}/3`} className="mb-4" striped animated /> */}
+
+                <FormProvider {...methods}>
+                  <Form onSubmit={handleSubmit(onSubmit)}>
+                    {step === 1 && <Step1 />}
+                    {step === 2 && <Step2 />}
+                    {step === 3 && <Step3 />}
+
+                    <div className="d-flex justify-content-between mt-4">
+                      {step > 1 && (
+                        <Button variant="dark text-danger" onClick={prevStep}>
+                          prev
+                        </Button>
+                      )}
+
+                      {step < 3 ? (
+                        <Button
+                          className="btn w-100 p-3 m-3"
+                          variant="dark text-danger"
+                          onClick={nextStep}
+                        >
+                          Next
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="success"
+                          type=" submit"
+                          disabled={!isValid}
+                        >
+                          register
+                        </Button>
+                      )}
+                    </div>
+                    <div className="pt-5">
+                      <p className="text-center pt-5">
+                        Already have an account?{" "}
+                        <a className="text-decoration-none " href="/login">
+                          <bold className="text-danger">Login Now</bold>
+                        </a>
+                      </p>
+                    </div>
+                  </Form>
+                </FormProvider>
+              </Card.Body>
+            </Card>
+          </div>
+        </div>
+      </div>
     <div className="container py-5">
       <Card className="shadow mx-auto" style={{ maxWidth: '600px' }}>
         <Card.Body className="p-4">
