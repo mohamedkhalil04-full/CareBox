@@ -3,32 +3,43 @@ import Register from "./../register/register";
 import ProjectLogo from "../../assets/images/proj-logo.png";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+
 const Login = () => {
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const user = users.find(
-      (u) => u.email === email && u.password === password
-    );
+    try {
+      const response = await fetch('http://careboxapi.runasp.net/api/Auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (user) {
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("currentUser", JSON.stringify(user));
-      alert("✅ Logged in successfully!");
-      navigate("/");
-    } else {
-      alert("❌ Invalid email or password");
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("token", data.token); // حفظ التوكن للطلبات الجاية
+        localStorage.setItem("isLoggedIn", "true");
+        alert("✅ Welcome Back!");
+        navigate("/");
+      } else {
+        alert("❌ Invalid email or password");
+      }
+    } catch {
+      alert("Server is down.");
     }
   };
+
+
+  
   return (
     <div id="back-page">
       <img src={ProjectLogo} className="p-3" alt="logo" width={100} />
-      <div className="carebox-container container mx-auto my-4 rounded w-25 d-flex flex-column">
+      <div className="carebox-container container bg-white mx-auto my-4 rounded w-25 d-flex flex-column">
         {/* <div className="text-start mb-4"></div> */}
         <h2 className="mb-4 pt-3">Welcome back! Glad to see you, Again!</h2>
 
