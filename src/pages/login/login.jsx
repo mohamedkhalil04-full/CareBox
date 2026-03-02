@@ -89,7 +89,7 @@ const Login = () => {
 
           <div className="text-end mb-4">
             <a
-              href="/otp"
+              href="/forgotPass"
               className="text-decoration-none text-danger"
               style={{ fontSize: "0.9em" }}
             >

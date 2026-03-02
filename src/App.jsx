@@ -2,20 +2,34 @@ import "./App.css";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
-import Home from "./pages/home/Home";
+
 import Login from "./pages/login/login";
 import Register from "./pages/register/register";
 import NotFound from "./pages/NotFound/NotFound";
 import AuthLayout from "./layouts/AuthLayout";
 import OTP from "./pages/OTP/otp";
+import ForgotPass from "./pages/forgotPass/forgotPass";
 import CreateNewPass from "./pages/CreateNewPass/CreateNewPass";
 import EditProfile from "./pages/EditProfile/EditProfile";
+import Home from "./pages/home/Home";
+import Bookings from './pages/bookings/bookings'
+import Clients from './pages/clients/clients'
+import Services from './pages/services/services'
+import Reviews from './pages/reviews/reviews'
+import Profile from './pages/profile/profile'
+import Settings from './pages/settings/settings'
 function App() {
   return (
     <Router>
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/bookings" element={<Bookings />} />
+          <Route path="/clients" element={<Clients />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/reviews" element={<Reviews />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
 
         {/* دول لوحدهم */}
@@ -25,6 +39,7 @@ function App() {
           <Route path="/otp" element={<OTP/>} />
           <Route path="/createnewpass" element={<CreateNewPass/>}/>
           <Route path="/editProfile" element={<EditProfile/>} />
+          <Route path='/forgotPass' element={<ForgotPass/>}/>
         </Route>
 
         {/* صفحة الخطأ */}

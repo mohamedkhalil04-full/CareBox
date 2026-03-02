@@ -1,18 +1,20 @@
-// import Navbar from '../components/Navbar/Navbar.jsx';
-// import Footer from '../components/Footer/Footer.jsx';
+import SideBar from '../components/sideBar/sideBar';
+import Head from '../components/header/header';
 import { Outlet } from 'react-router-dom';
-// import Newsletter from './../components/Newsletter/Newsletter';
 
 const MainLayout = () => {
   return (
-    <>
-      {/* <Navbar /> */}
-      <main>
-        <Outlet /> 
-      </main>
-      {/* <Newsletter /> */}
-      {/* <Footer /> */}
-    </>
+    <div className='d-flex'>
+
+      <SideBar />
+      <div className='w-100'>
+        <Head />
+        <main>
+          <Outlet />
+        </main>
+      </div>
+
+    </div>
   );
 };
 
