@@ -1,32 +1,462 @@
-// steps/Step1.jsx
-import { Form,useFormContext } from 'react-hook-form';
-import { FormGroup, FormLabel, FormControl, FormText } from 'react-bootstrap';
+// import './step3.css'
+// import { Form,useFormContext } from 'react-hook-form';
+// import {Col,Row, FormGroup, FormLabel, FormControl, FormText } from 'react-bootstrap';
+// import { useEffect , useState } from 'react';
 
-const Step3=()=> {
-  const { register, formState: { errors } } = useFormContext();
+// const Step3=()=> {
+
+// const { register,setValue,watch, formState: { errors } } = useFormContext();
+// const [logoPreview, setLogoPreview] = useState(null);
+//   // راقب حقل الرابط فقط
+//   const mapLink = watch('mapLink'); // لازم تضيف mapLink في الـ defaultValues أو في الـ yup
+
+//   useEffect(() => {
+//     if (!mapLink || typeof mapLink !== 'string' || mapLink.trim() === '') {
+//       // لو الرابط فاضي → امسح الإحداثيات
+//       setValue('latitude', '');
+//       setValue('longitude', '');
+//       return;
+//     }
+//     const url = mapLink.trim();
+
+//     // محاولة استخراج الإحداثيات مباشرة من الرابط (يدعم الطويل والقصير بعد redirect نظري)
+//     const match =
+//       url.match(/@(-?\d+\.?\d{1,8}),(-?\d+\.?\d{1,8})/) ||
+//       url.match(/!3d(-?\d+\.?\d{1,8})!4d(-?\d+\.?\d{1,8})/) ||
+//       url.match(/(-?\d+\.\d{5,8}),\s*(-?\d+\.\d{5,8})/); // بعض الروابط بتنسيق مختلف
+
+//     if (match && match[1] && match[2]) {
+//       const lat = parseFloat(match[1]);
+//       const lng = parseFloat(match[2]);
+
+//       if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+//         const latFixed = lat.toFixed(8);
+//         const lngFixed = lng.toFixed(8);
+
+//         // حفظ داخلي فقط
+//         setValue('latitude', latFixed);
+//         setValue('longitude', lngFixed);
+
+//         // للتطوير فقط – شيلها لاحقًا لو عايز
+//         console.log('تم استخراج الإحداثيات من الرابط:', { latitude: latFixed, longitude: lngFixed });
+//       } else {
+//         console.warn('إحداثيات غير صالحة من الرابط:', url);
+//         setValue('latitude', '');
+//         setValue('longitude', '');
+//       }
+//     } else {
+//       // لو ما لقاش → ممكن الرابط قصير جدًا ومحتاج fetch
+//       // هنا بنحاول نعمل fetch بسيط (HEAD) عشان نجيب الـ final URL
+//       fetch(url, { method: 'HEAD', redirect: 'follow', mode: 'no-cors' })
+//         .then((res) => {
+//           // للأسف no-cors مش هيدينا res.url
+//           // لذا الطريقة الأفضل هي نعتمد على أن المستخدم يعطي الرابط الطويل
+//           // أو نطلب منه يفتح الرابط وياخد النسخة الكاملة
+//           console.log('الرابط بعد redirect (في المتصفح):', res.url || url);
+//         })
+//         .catch((err) => {
+//           console.warn('مشكلة في متابعة الرابط القصير:', err);
+//         });
+
+//       // في الإصدار ده بنمسح الإحداثيات لو ما نفعش الـ regex
+//       setValue('latitude', '');
+//       setValue('longitude', '');
+//     }
+//   }, [mapLink, setValue]);
+
+  
+//    const handleLogoChange = (e) => {
+//      const file = e.target.files[0];
+//      if (file) {
+//       setValue('image', file, { shouldValidate: true }); // حفظها في Hook Form
+//        const reader = new FileReader();
+//        reader.onloadend = () => {
+//           setLogoPreview(reader.result);
+//        };
+//        reader.readAsDataURL(file);
+//      }
+//      console.log('Data:', { logo: logoPreview });
+//    };
+  
+//   return (
+//     <>
+
+//     {/* address */}
+//     <FormGroup className="form-floating mb-3">
+//         {/* <FormLabel>address</FormLabel> */}
+//         <FormControl
+//           type="text"
+//           placeholder=''
+//           {...register('address')}
+//           isInvalid={!!errors.address}
+//         />
+//         <label htmlFor="floatingInput">address</label>
+//         {errors.address && <FormText className="text-danger">{errors.address.message}</FormText>}
+//       </FormGroup>
+
+      
+//             {/* Location */}
+
+//        <FormGroup className="form-floating mb-3">
+//          {/* <FormLabel>Location</FormLabel> */}
+//          <FormControl
+//            type="url"
+//            placeholder='Enter location'
+//            required
+//            {...register('location', { required: 'location is required' })}
+//            isInvalid={!!errors.location}
+//          />
+//          <label htmlFor="flaotingInput">location</label>
+//          {errors.location && <FormText className="text-danger">{errors.location.message}</FormText>}
+//        </FormGroup>
+
+      
+//  {/* working hours */}
+
+//        <Row>
+//          <Col md={6}>
+//            <FormGroup className="mb-3">
+//              <FormLabel>from</FormLabel>
+//              <FormControl type="time" {...register('workingFrom')} isInvalid={!!errors.workingFrom} />
+//              {errors.workingFrom && <FormText className="text-danger">{errors.workingFrom.message}</FormText>}
+//            </FormGroup>
+//          </Col>
+//          <Col md={6}>
+//            <FormGroup className="mb-3">
+//              <FormLabel>to</FormLabel>
+//              <FormControl type="time" {...register('workingTo')} isInvalid={!!errors.workingTo} />
+//              {errors.workingTo && <FormText className="text-danger">{errors.workingTo.message}</FormText>}
+//            </FormGroup>
+//          </Col>
+//        </Row>
+
+
+// {/* ////////////////////////////////////////////////// */}
+       
+//          {/* Add Logo */}
+//          <div className="text-center">
+          
+//            <div
+//              className="border rounded-3  text-center bg-secondary "
+//               style={{
+//                 borderStyle: 'dashed',
+//                 cursor: 'pointer',
+//                 minHeight: '120px',
+//                 backgroundColor: '#f8f9fa',
+//               }}
+//              onClick={() => document.getElementById('logoInput').click()}
+//            >
+            
+//             <b className='plus-sign'>+</b>
+//             <p>add your logo</p>
+//            </div>
+//            <input
+//              id="logoInput"
+//              type="file"
+//              accept="image/*"
+//              onChange={handleLogoChange}
+//              style={{ display: 'none',  }}
+//            />
+//          </div>
+//      </>
+  
+//   );
+// }
+
+// export default Step3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import './step3.css'
+import { Form, useFormContext } from 'react-hook-form';
+import { Col, Row, FormGroup, FormLabel, FormControl, FormText } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+
+const Step3 = () => {
+  const { register, setValue, watch, formState: { errors } } = useFormContext();
+  const [logoPreview, setLogoPreview] = useState(null);
+
+  // استخراج الإحداثيات (اللوجيك كما هو)
+  const mapLink = watch('location'); 
+
+  useEffect(() => {
+    if (!mapLink || typeof mapLink !== 'string' || mapLink.trim() === '') {
+      setValue('latitude', '');
+      setValue('longitude', '');
+      return;
+    }
+    const url = mapLink.trim();
+    const match =
+      url.match(/@(-?\d+\.?\d{1,8}),(-?\d+\.?\d{1,8})/) ||
+      url.match(/!3d(-?\d+\.?\d{1,8})!4d(-?\d+\.?\d{1,8})/) ||
+      url.match(/(-?\d+\.\d{5,8}),\s*(-?\d+\.\d{5,8})/);
+
+    if (match && match[1] && match[2]) {
+      const lat = parseFloat(match[1]);
+      const lng = parseFloat(match[2]);
+      if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+        setValue('latitude', lat.toFixed(8));
+        setValue('longitude', lng.toFixed(8));
+      }
+    } else {
+      setValue('latitude', '');
+      setValue('longitude', '');
+    }
+  }, [mapLink, setValue]);
+
+  // تحديث الصورة في الفورم وعمل Preview
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setValue('image', file, { shouldValidate: true }); // حفظها في Hook Form
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   
   return (
     <>
-
-    {/* address */}
-    <FormGroup className="form-floating mb-3">
-        {/* <FormLabel>address</FormLabel> */}
+      <FormGroup className="form-floating mb-3">
         <FormControl
           type="text"
           placeholder=''
           {...register('address')}
           isInvalid={!!errors.address}
         />
-        <label htmlFor="floatingInput">address</label>
+        <label>Address</label>
         {errors.address && <FormText className="text-danger">{errors.address.message}</FormText>}
       </FormGroup>
-      
 
+      <FormGroup className="form-floating mb-3">
+        <FormControl
+          type="url"
+          placeholder='Enter location'
+          {...register('location', { required: 'location is required' })}
+          isInvalid={!!errors.location}
+        />
+        <label>Location URL</label>
+        {errors.location && <FormText className="text-danger">{errors.location.message}</FormText>}
+      </FormGroup>
+
+      <Row>
+        <Col md={6}>
+          <FormGroup className="mb-3">
+            <FormLabel>From</FormLabel>
+            <FormControl type="time" {...register('workingFrom')} isInvalid={!!errors.workingFrom} />
+            {errors.workingFrom && <FormText className="text-danger">{errors.workingFrom.message}</FormText>}
+          </FormGroup>
+        </Col>
+        <Col md={6}>
+          <FormGroup className="mb-3">
+            <FormLabel>To</FormLabel>
+            <FormControl type="time" {...register('workingTo')} isInvalid={!!errors.workingTo} />
+            {errors.workingTo && <FormText className="text-danger">{errors.workingTo.message}</FormText>}
+          </FormGroup>
+        </Col>
+      </Row>
+
+      <div className="text-center">
+        <div
+          className="border rounded-3 text-center bg-secondary"
+          style={{
+            borderStyle: 'dashed',
+            cursor: 'pointer',
+            minHeight: '120px',
+            backgroundColor: '#f8f9fa',
+            overflow: 'hidden'
+          }}
+          onClick={() => document.getElementById('logoInput').click()}
+        >
+          {logoPreview ? (
+            <img src={logoPreview} alt="Logo preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <>
+              <b className='plus-sign'>+</b>
+              <p>Add your logo</p>
+            </>
+          )}
+        </div>
+        <input
+          id="logoInput"
+          type="file"
+          accept="image/*"
+          onChange={handleLogoChange}
+          style={{ display: 'none' }}
+        />
+      </div>
     </>
   );
 }
 
-export default Step3
+export default Step3;
+
+
+
+
+
+
+
+
+
+
+  
+//   return (
+//     <>
+//       <FormGroup className="form-floating mb-3">
+//         <FormControl
+//           type="text"
+//           placeholder=''
+//           {...register('address')}
+//           isInvalid={!!errors.address}
+//         />
+//         <label>Address</label>
+//         {errors.address && <FormText className="text-danger">{errors.address.message}</FormText>}
+//       </FormGroup>
+
+//       <FormGroup className="form-floating mb-3">
+//         <FormControl
+//           type="url"
+//           placeholder='Enter location'
+//           {...register('location', { required: 'location is required' })}
+//           isInvalid={!!errors.location}
+//         />
+//         <label>Location URL</label>
+//         {errors.location && <FormText className="text-danger">{errors.location.message}</FormText>}
+//       </FormGroup>
+
+//       <Row>
+//         <Col md={6}>
+//           <FormGroup className="mb-3">
+//             <FormLabel>From</FormLabel>
+//             <FormControl type="time" {...register('workingFrom')} isInvalid={!!errors.workingFrom} />
+//             {errors.workingFrom && <FormText className="text-danger">{errors.workingFrom.message}</FormText>}
+//           </FormGroup>
+//         </Col>
+//         <Col md={6}>
+//           <FormGroup className="mb-3">
+//             <FormLabel>To</FormLabel>
+//             <FormControl type="time" {...register('workingTo')} isInvalid={!!errors.workingTo} />
+//             {errors.workingTo && <FormText className="text-danger">{errors.workingTo.message}</FormText>}
+//           </FormGroup>
+//         </Col>
+//       </Row>
+
+//       <div className="text-center">
+//         <div
+//           className="border rounded-3 text-center bg-secondary"
+//           style={{
+//             borderStyle: 'dashed',
+//             cursor: 'pointer',
+//             minHeight: '120px',
+//             backgroundColor: '#f8f9fa',
+//             overflow: 'hidden'
+//           }}
+//           onClick={() => document.getElementById('logoInput').click()}
+//         >
+//           {logoPreview ? (
+//             <img src={logoPreview} alt="Logo preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+//           ) : (
+//             <>
+//               <b className='plus-sign'>+</b>
+//               <p>Add your logo</p>
+//             </>
+//           )}
+//         </div>
+//         <input
+//           id="logoInput"
+//           type="file"
+//           accept="image/*"
+//           onChange={handleLogoChange}
+//           style={{ display: 'none' }}
+//         />
+//       </div>
+//     </>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -38,8 +468,6 @@ export default Step3
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
 
 
@@ -78,16 +506,6 @@ export default Step3
 //     }
 //   };
 
-//   const handleLogoChange = (e) => {
-//     const file = e.target.files[0];
-//     if (file) {
-//       const reader = new FileReader();
-//       reader.onloadend = () => {
-//         // setLogoPreview(reader.result);
-//       };
-//       reader.readAsDataURL(file);
-//     }
-//   };
 //   //   // هنا ابعت البيانات للـ backend أو الصفحة الجاية
 //   //   console.log('Data:', { address, location, workingHours, logo: logoPreview });
 //   //   // navigate('/next-step')
@@ -106,19 +524,6 @@ export default Step3
 //         // }}
 //       >
        
-
-//         {/* Address */}
-//         <div className="mb-3">
-//           <label className="form-label fw-medium"></label>
-//           <input
-//             type="text"
-//             className="form-control"
-//             placeholder="Address"
-//             value={address}
-//             onChange={(e) => setAddress(e.target.value)}
-//             style={{ borderRadius: '10px' }}
-//           />
-//         </div>
 
 //         {/* Location */}
 //         <div className="mb-4">
@@ -178,35 +583,6 @@ export default Step3
 //           </div>
 //         </div>
 
-//         {/* Add Logo */}
-//         <div className="text-center">
-          
-//           <div
-//             className="border rounded-3  text-center bg-secondary "
-//             // style={{
-//             //   borderStyle: 'dashed',
-//             //   cursor: 'pointer',
-//             //   minHeight: '120px',
-//             //   backgroundColor: '#f8f9fa',
-//             // }}
-//             onClick={() => document.getElementById('logoInput').click()}
-//           >
-            
-//            <b className='plus-sign'>+</b>
-//            <p>add your logo</p>
-//           </div>
-//           <input
-//             id="logoInput"
-//             type="file"
-//             accept="image/*"
-//             onChange={handleLogoChange}
-//             style={{ display: 'none',  }}
-//           />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
 
 // export default RegisterStep2;
 
@@ -235,134 +611,10 @@ export default Step3
 
 
 
-// import { Form,useFormContext } from 'react-hook-form';
-// import {Col,Row, FormGroup, FormLabel, FormControl, FormText } from 'react-bootstrap';
-// import { useEffect } from 'react';
-// const Step2=()=> {
-//   const { register,setValue,watch, formState: { errors } } = useFormContext();
 
-
-//   // راقب حقل الرابط فقط
-//   const mapLink = watch('mapLink'); // لازم تضيف mapLink في الـ defaultValues أو في الـ yup
-
-//   useEffect(() => {
-//     if (!mapLink || typeof mapLink !== 'string' || mapLink.trim() === '') {
-//       // لو الرابط فاضي → امسح الإحداثيات
-//       setValue('latitude', '');
-//       setValue('longitude', '');
-//       return;
-//     }
-
-//     const url = mapLink.trim();
-
-//     // محاولة استخراج الإحداثيات مباشرة من الرابط (يدعم الطويل والقصير بعد redirect نظري)
-//     const match =
-//       url.match(/@(-?\d+\.?\d{1,8}),(-?\d+\.?\d{1,8})/) ||
-//       url.match(/!3d(-?\d+\.?\d{1,8})!4d(-?\d+\.?\d{1,8})/) ||
-//       url.match(/(-?\d+\.\d{5,8}),\s*(-?\d+\.\d{5,8})/); // بعض الروابط بتنسيق مختلف
-
-//     if (match && match[1] && match[2]) {
-//       const lat = parseFloat(match[1]);
-//       const lng = parseFloat(match[2]);
-
-//       if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-//         const latFixed = lat.toFixed(8);
-//         const lngFixed = lng.toFixed(8);
-
-//         // حفظ داخلي فقط
-//         setValue('latitude', latFixed);
-//         setValue('longitude', lngFixed);
-
-//         // للتطوير فقط – شيلها لاحقًا لو عايز
-//         console.log('تم استخراج الإحداثيات من الرابط:', { latitude: latFixed, longitude: lngFixed });
-//       } else {
-//         console.warn('إحداثيات غير صالحة من الرابط:', url);
-//         setValue('latitude', '');
-//         setValue('longitude', '');
-//       }
-//     } else {
-//       // لو ما لقاش → ممكن الرابط قصير جدًا ومحتاج fetch
-//       // هنا بنحاول نعمل fetch بسيط (HEAD) عشان نجيب الـ final URL
-//       fetch(url, { method: 'HEAD', redirect: 'follow', mode: 'no-cors' })
-//         .then((res) => {
-//           // للأسف no-cors مش هيدينا res.url
-//           // لذا الطريقة الأفضل هي نعتمد على أن المستخدم يعطي الرابط الطويل
-//           // أو نطلب منه يفتح الرابط وياخد النسخة الكاملة
-//           console.log('الرابط بعد redirect (في المتصفح):', res.url || url);
-//         })
-//         .catch((err) => {
-//           console.warn('مشكلة في متابعة الرابط القصير:', err);
-//         });
-
-//       // في الإصدار ده بنمسح الإحداثيات لو ما نفعش الـ regex
-//       setValue('latitude', '');
-//       setValue('longitude', '');
-//     }
-//   }, [mapLink, setValue]);
-
-
-//   return (
-//     <>
-    
-//     {/* address */}
-//       <FormGroup className="form-floating mb-3">
-//         {/* <FormLabel>Address</FormLabel> */}
-//         <FormControl
-//         type='text'
-//         placeholder='Enter address'
-//         required
-//           {...register('address')}
-//           isInvalid={!!errors.address}
-//         />
-//         <label htmlFor="flaotingInput">address</label>
-//         {errors.address && <FormText className="text-danger">{errors.address.message}</FormText>}
-//       </FormGroup>
-
-
-//       {/* /////////////////////////////////////////////////////// */}
-
-
-//            {/* Location */}
-
-//       <FormGroup className="form-floating mb-3">
-//         {/* <FormLabel>Location</FormLabel> */}
-//         <FormControl
-//           type="url"
-//           placeholder='Enter location'
-//           required
-//           {...register('location', { required: 'location is required' })}
-//           isInvalid={!!errors.location}
-//         />
-//         <label htmlFor="flaotingInput">location</label>
-//         {errors.location && <FormText className="text-danger">{errors.location.message}</FormText>}
-//       </FormGroup>
 
 
 
 // {/* ////////////////////////////////////////////////////////////////////////////////////////////// */}
 
 
-
-// {/* working hours */}
-
-//       <Row>
-//         <Col md={6}>
-//           <FormGroup className="mb-3">
-//             <FormLabel>from</FormLabel>
-//             <FormControl type="time" {...register('workingFrom')} isInvalid={!!errors.workingFrom} />
-//             {errors.workingFrom && <FormText className="text-danger">{errors.workingFrom.message}</FormText>}
-//           </FormGroup>
-//         </Col>
-//         <Col md={6}>
-//           <FormGroup className="mb-3">
-//             <FormLabel>to</FormLabel>
-//             <FormControl type="time" {...register('workingTo')} isInvalid={!!errors.workingTo} />
-//             {errors.workingTo && <FormText className="text-danger">{errors.workingTo.message}</FormText>}
-//           </FormGroup>
-//         </Col>
-//       </Row>
-//     </>
-//   );
-// }
-
-// export default Step2

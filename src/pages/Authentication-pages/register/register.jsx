@@ -1,6 +1,5 @@
 // Register.jsx
 import "./register.css";
-import ProjectLogo from "../../assets/images/proj-logo.png";
 
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
@@ -8,10 +7,9 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Button, ProgressBar, Card, Form } from 'react-bootstrap';
-import Step1 from '../../components/register-steps/step1/step1';
-import Step2 from '../../components/register-steps/step2/step2';
-import Step3 from '../../components/register-steps/step3/step3';
-// import { div } from "framer-motion/client";
+import Step1 from '../../../components/register-steps/step1/step1';
+import Step2 from '../../../components/register-steps/step2/step2';
+import Step3 from '../../../components/register-steps/step3/step3';
 
 const providerTypeMapping = {
   "Maintenance": 1,
@@ -22,23 +20,36 @@ const providerTypeMapping = {
 
 const schema = yup.object({
   providerType: yup.string().required('the provider type is required'),
+
   name: yup.string().required('the name is required'),
+
   phone: yup.string().required('Phone number is required'),
+
   image: yup.mixed().optional(),
+
   address: yup.string().required('the Address is required'),
+
   location: yup.string().url('invalid URL').required('url location is required'),
   latitude: yup.string().nullable(),
   longitude: yup.string().nullable(),
+
   workingFrom: yup.string().required('opening time is required'),
   workingTo: yup.string().required('closing time is required'),
+
   email: yup.string().email('invalid email').required('email is required'),
-  password: yup.string().matches(/[^a-zA-Z0-9]/, 'password must has at least 1 symbol like -> (@#$%^&*...)')
-   .required('password is required').matches(/[a-z]/,'password must has at least 1 Lower case litter')
-   .min(8,'password must be at least 8 digits').matches(/[A-Z]/,'password must has at least 1 Upper case litter')
-   .matches(/[0-9]/,'password must has at least 1 Number'),
+
+  password: yup.string()
+   .min(8,'password must be at least 8 digits')
+   .matches(/[^a-zA-Z0-9]/, 'password must has at least 1 symbol like -> (@#$%^&*...)')
+   .matches(/[a-z]/,'password must has at least 1 Lower case litter')
+   .matches(/[A-Z]/,'password must has at least 1 Upper case litter')
+   .matches(/[0-9]/,'password must has at least 1 Number')
+   .required('password is required'),
+
   confirmPassword: yup.string()
     .oneOf([yup.ref('password')], 'Passwords must match')
     .required('confirming password is required'),
+    
 }).required();
 
 export default function Register() {
@@ -68,7 +79,6 @@ export default function Register() {
     const typeId = providerTypeMapping[data.providerType] || 1;
     formData.append('ProviderTypeId', typeId);
 
-    // 3. تعديل المسميات لتبدأ بحرف كابيتال (PascalCase) عشان تطابق السيرفر
     formData.append('Name', data.name);
     formData.append('PhoneNumber', data.phone);
     formData.append('Address', data.address);
@@ -82,14 +92,15 @@ export default function Register() {
     formData.append('Email', data.email);
     formData.append('Password', data.password);
 
-    // السيرفر قلك ConfirmPassword مطلوب؟ يبقى نبعته
     formData.append('ConfirmPassword', data.confirmPassword);
 
     if (data.image && data.image[0]) {
       formData.append('Image', data.image[0]);
     }
 
+
     try {
+      // الربط مع الباك إند
       const response = await fetch('http://careboxapi.runasp.net/api/Auth/register/provider', {
         method: 'POST',
         body: formData,
@@ -99,10 +110,10 @@ export default function Register() {
 
       if (response.ok) {
         localStorage.setItem('pendingEmail', data.email);
+        localStorage.setItem('otpFlow', 'register'); // تحديد نوع العملية
         alert('Success! Check your email for OTP.');
         navigate('/otp');
       } else {
-        // لو في خطأ تاني، الكود ده هيظهرهولك بالتفصيل في alert
         console.error('Server Error:', result);
         alert(`خطأ: ${JSON.stringify(result.errors || result.message || result)}`);
       }
@@ -112,15 +123,13 @@ export default function Register() {
   };
 
   return (
-    <div id="back-page">
-      <img src={ProjectLogo} className="p-3" alt="logo" width={100} />
-      <div className="container py-5">
-        <Card className="shadow mx-auto" style={{ maxWidth: '600px' }}>
+        <Card className="mx-auto" id="register" style={{ maxWidth: '600px'
+         }}>
           <Card.Body className="p-4">
             <h3 className="text-center mb-4">
               Hello! Register to get started
             </h3>
-            <ProgressBar now={(step / 3) * 100} label={`${step}/3`} className="mb-4" striped animated />
+            <ProgressBar now={(step / 3) * 100} label={`${step}/3`} className="mb-4" striped animated variant="black" />
             <FormProvider {...methods}>
               <Form onSubmit={handleSubmit(onSubmit)}>
                 {step === 1 && <Step1 />}
@@ -138,7 +147,7 @@ export default function Register() {
                 <div className="pt-3">
                   <p className="text-center">
                     Already have an account?{" "}
-                    <a className="text-decoration-none " href="/login">
+                    <a className="text-decoration-none " href="/">
                       <bold className="text-danger">Login Now</bold>
                     </a>
                   </p>
@@ -147,8 +156,10 @@ export default function Register() {
             </FormProvider>
           </Card.Body>
         </Card>
-      </div>
-    </div>
   );
 
 }
+
+
+
+

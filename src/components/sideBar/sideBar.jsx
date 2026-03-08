@@ -1,72 +1,74 @@
 import "./sideBar.css";
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import ProjectLogo from '../../assets/images/proj-logo.png';
+import { NavLink } from 'react-router-dom';
 
 
   
 const SideBar =()=>{
 
 
-
+const activeStyle = ({ isActive }) => ({
+    color: isActive ? "red" : "",
+    backgroundColor: isActive ? "#eff6fa" : "",
+  });
 
 
     return (
-    // vh-100 بتخلي السايد بار ياخد 100% من طول الشاشة
-    <aside className="bg-dark text-white d-flex flex-column p-3 vh-100 shadow" style={{ width: '260px' }}>
-      
-      {/* اللوجو واسم المشروع */}
-      <div className="d-flex align-items-center gap-3 mb-5 mt-2 px-2">
-        <img src={ProjectLogo} alt="Logo" width="45" />
-        <h4 className="mb-0 text-danger fw-bold">CareBox</h4>
+    
+    <aside className="bg-white d-flex flex-column p-3 vh-100" style={{ width: '260px' , borderRight:'1px gray solid', }}>
+     
+      <div className="d-flex flex-column align-items-center  mb-5 mt-2">
+        <i class="fa-solid fa-car p-1"></i>
+        <small className="text-secondary py-1">Welcome Back</small>
+        <b className="mb-0  fw-bold">AutoFix Workshop</b>
       </div>
 
       {/* لينكات التصفح */}
       <ul className="nav nav-pills flex-column mb-auto gap-2">
-        <li className="nav-item">
-          <Link to="/" className="nav-link text-white bg-danger shadow-sm">
-            <i className="me-2">🏠</i> Home
-          </Link>
+        <li className="nav-item ">
+          <NavLink style={activeStyle} to="/home" className="nav-link  ">
+            <i className="me-2 "><i class="fa-regular fa-house"></i></i> Home
+          </NavLink>
         </li>
-        <li className="nav-item">
-          <Link to="/bookings" className="nav-link text-white">
-            <i className="me-2">🔧</i> Bookings
-          </Link>
+        <li className="nav-item ">
+          <NavLink style={activeStyle} to="/bookings" className="nav-link ">
+            <i className="me-2 "><i class="fa-regular fa-calendar"></i></i> Bookings
+          </NavLink>
         </li>
-        <li className="nav-item">
-          <Link to="/clients" className="nav-link text-white">
-            <i className="me-2">🔧</i> Clients
-          </Link>
+        <li className="nav-item ">
+          <NavLink style={activeStyle} to="/clients" className="nav-link ">
+            <i className="me-2 "><i class="fa-solid fa-users"></i></i> Clients
+          </NavLink>
         </li>
-        <li className="nav-item">
-          <Link to="/services" className="nav-link text-white">
-            <i className="me-2">🔧</i> Services
-          </Link>
+        <li className="nav-item ">
+          <NavLink style={activeStyle} to="/services" className="nav-link ">
+            <i className="me-2 "><i class="fa-solid fa-wrench"></i></i> Services
+          </NavLink>
         </li>
-        <li className="nav-item">
-          <Link to="/reviews" className="nav-link text-white">
-            <i className="me-2">🔧</i> Reviews
-          </Link>
+        <li className="nav-item ">
+          <NavLink style={activeStyle} to="/reviews" className="nav-link ">
+            <i className="me-2 "><i class="fa-regular fa-star"></i></i> Reviews
+          </NavLink>
         </li>
-        <li className="nav-item">
-          <Link to="/profile" className="nav-link text-white">
-            <i className="me-2">🔧</i> Profile
-          </Link>
+        <li className="nav-item ">
+          <NavLink style={activeStyle} to="/profile" className="nav-link ">
+            <i className="me-2 "><i class="fa-regular fa-user"></i></i> Profile
+          </NavLink>
         </li>
-        <li className="nav-item">
-          <Link to="/settings" className="nav-link text-white">
-            <i className="me-2">👥</i> Settings
-          </Link>
+        <li className="nav-item ">
+          <NavLink style={activeStyle} to="/settings" className="nav-link ">
+            <i className="me-2 "><i class="fa-solid fa-gear"></i></i> Settings
+          </NavLink>
         </li>
       </ul>
-
-      <hr className="text-white-50" />
-      
-      {/* زرار تسجيل الخروج في الأسفل */}
+{/* 
+      <hr className="text-dark-50" />
+       */}
+{/*       
       <button className="btn btn-outline-light w-100 d-flex align-items-center justify-content-center gap-2">
         <span>🚪</span> Logout
-      </button>
+      </button> */}
     </aside>
   );
 

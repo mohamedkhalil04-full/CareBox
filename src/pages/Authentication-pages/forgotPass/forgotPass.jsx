@@ -1,19 +1,36 @@
 import './forgotPass.css'
-import ProjectLogo from "../../assets/images/proj-logo.png";
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 const ForgotPass = () => {
 
     const [email, setEmail] = useState('')
-    // const navigate =useNavigate()
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-    }
+    const navigate =useNavigate()
+    
+
+     const handleSubmit = async (e) => {
+         e.preventDefault();
+         try {
+             const response = await fetch('http://careboxapi.runasp.net/api/Auth/forgot-password', {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({ email }),
+             });
+
+             if (response.ok) {
+                 localStorage.setItem('pendingEmail', email);
+                 localStorage.setItem('otpFlow', 'reset'); 
+                 navigate('/otp');
+             } else {
+                 alert("❌ User not found or error occurred.");
+             }
+         } catch {
+             alert("Server error.");
+         }
+     }
+
 
     return (
-        <div id="back-page">
-            <img src={ProjectLogo} className="p-3" alt="logo" width={100} />
-            <form onSubmit={handleSubmit} className="new-pass-form container mx-auto my-4 p-4 rounded w-50 bg-white d-flex flex-column ">
+            <form onSubmit={handleSubmit} className="forgot-pass-form container mx-auto my-4 p-4 rounded w-50 bg-white d-flex flex-column ">
                 <h2>Forgot Password?</h2>
                 <small>
                     Don't worry! it occurs. please enter the email address linked with your account.
@@ -44,15 +61,13 @@ const ForgotPass = () => {
                 <div className="pt-5">
                     <p className="text-center">
                         Remember Password?{" "}
-                        <a className="text-decoration-none " href="/login">
+                        <a className="text-decoration-none " href="/">
                             <bold className="text-danger">Login Now</bold>
                         </a>
                     </p>
                 </div>
             </form>
 
-        </div>
     )
 }
-
 export default ForgotPass

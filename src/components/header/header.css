@@ -1,3 +1,10 @@
-/* header{
-    position: fixed;
-} */
+.search{
+    width: 400px;
+    height: 45px;
+    border:gray solid 1px;
+    padding-left: 25px;
+}
+.fa-bell{
+    font-size: 27px;
+    color: gray;
+}

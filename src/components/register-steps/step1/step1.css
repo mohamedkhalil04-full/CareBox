@@ -1,12 +1,11 @@
-/* .plus-sign{
-    font-size: 90px;
-} */
+
 
 .service-type-btn{
     transition: .5s;
 }
 .service-type-btn:hover{
-    transform: translateY(-5px); 
+  transition: .5s;
+  transform: translateY(-5px); 
   border-color: #dc3545 !important; 
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important; 
   background-color: #f8f9fa !important;

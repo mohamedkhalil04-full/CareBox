@@ -3,7 +3,7 @@ import "./clients.css";
 const Clients = () => {
   return (
     <>
-      clients
+      <h2>clients</h2> 
     </>
   );
 };

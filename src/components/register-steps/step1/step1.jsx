@@ -11,29 +11,29 @@ const Step1=()=> {
 
   const services = [
     {
-      id: 'repair',
-      title: 'Car Repair',
+      id: 'Maintenance',
+      title: 'Maintenance',
       desc: 'Expert diagnostics',
       icon: '🔧', // أو ممكن تستخدم react-icons: <FaTools />
       color: '#dc3545', 
     },
     {
-      id: 'wash',
-      title: 'Car Wash',
+      id: 'care',
+      title: 'Car Care',
       desc: 'Premium detailing',
       icon: '🧼',
       color: '#0d6efd', 
     },
     {
       id: 'emergency',
-      title: 'Emergency',
+      title: 'Emergancy',
       desc: '24/7 roadside help',
       icon: '⚠️',
       color: '#fd7e14', 
     },
     {
       id: 'parts',
-      title: 'Spare Parts',
+      title: 'Spare parts and accessories',
       desc: 'Genuine OEM parts & accessories',
       icon: '🛠️',
       color: '#198754', 
@@ -49,7 +49,7 @@ const Step1=()=> {
   return (
         <div>
       {/* حقل مخفي عشان الـ Validation بتاع Yup يشتغل صح */}
-      <input type="hidden" {...register('providerType')} />
+       <input type="hidden" {...register('providerType')} />  {/* يبن اللاعيبه  */}
 
       <div className="row g-3 mb-5">
         {services.map((service) => (
