@@ -1,6 +1,6 @@
 // Register.jsx
 import "./register.css";
-
+import api from '../../../api/axiosInstance'
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useForm, FormProvider } from 'react-hook-form';
@@ -98,29 +98,22 @@ export default function Register() {
       formData.append('Image', data.image[0]);
     }
 
-
     try {
-      // الربط مع الباك إند
-      const response = await fetch('http://careboxapi.runasp.net/api/Auth/register/provider', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
+      // لاحظ أننا نرسل الـ formData مباشرة كـ Parameter ثاني
+      const response = await api.post('/Auth/register/provider', formData);
+      // في Axios، البيانات تكون موجودة في response.data
+      if (response.status === 200 || response.status === 201) {
         localStorage.setItem('pendingEmail', data.email);
-        localStorage.setItem('otpFlow', 'register'); // تحديد نوع العملية
+        localStorage.setItem('otpFlow', 'register'); 
         alert('Success! Check your email for OTP.');
         navigate('/otp');
-      } else {
-        console.error('Server Error:', result);
-        alert(`خطأ: ${JSON.stringify(result.errors || result.message || result)}`);
       }
     } catch {
       alert('Network error, please check your connection.');
     }
   };
+
+  
 
   return (
         <Card className="mx-auto" id="register" style={{ maxWidth: '600px'
@@ -148,7 +141,7 @@ export default function Register() {
                   <p className="text-center">
                     Already have an account?{" "}
                     <a className="text-decoration-none " href="/">
-                      <bold className="text-danger">Login Now</bold>
+                      <label className="text-danger">Login Now</label>
                     </a>
                   </p>
                 </div>

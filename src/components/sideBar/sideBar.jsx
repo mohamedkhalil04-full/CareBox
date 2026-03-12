@@ -1,17 +1,34 @@
 import "./sideBar.css";
+import { NavLink} from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import api from "../../api/axiosInstance"; // تأكد من المسار
 
-import React from 'react';
-import { NavLink } from 'react-router-dom';
 
-
-  
 const SideBar =()=>{
-
-
+const navigate = useNavigate()
 const activeStyle = ({ isActive }) => ({
     color: isActive ? "red" : "",
     backgroundColor: isActive ? "#eff6fa" : "",
   });
+
+  const handleLogout = async () => {
+  try {
+    // نبلغ الباك إند إننا هنقفل الـ Token ده
+    // ملحوظة: الـ axiosInstance بيبعت التوكن أوتوماتيك في الـ Headers
+    await api.post('/Auth/revoke-token/logout'); 
+  } catch (error) {
+    console.error("Logout error:", error);
+  } finally {
+    // 2. بنمسح كل الداتا من الـ localStorage سواء الريكويست نجح أو فشل
+    localStorage.removeItem("token");
+    localStorage.removeItem("isLoggedIn");
+    
+    // 3. بنرجع اليوزر لصفحة اللوجن
+    alert("Logged out successfully!");
+    navigate("/"); 
+  }
+};
+ 
 
 
     return (
@@ -62,13 +79,13 @@ const activeStyle = ({ isActive }) => ({
           </NavLink>
         </li>
       </ul>
-{/* 
-      <hr className="text-dark-50" />
-       */}
-{/*       
-      <button className="btn btn-outline-light w-100 d-flex align-items-center justify-content-center gap-2">
+
+      <hr className="text-dark-50"/>
+       
+     
+      <button onClick={handleLogout} className="btn btn-outline-danger w-100 d-flex justify-content-center gap-2">
         <span>🚪</span> Logout
-      </button> */}
+      </button>
     </aside>
   );
 

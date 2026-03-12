@@ -2,49 +2,70 @@ import "./otp.css";
 import { useState } from 'react';
 import OtpInput from 'react-otp-input';
 import { useNavigate } from "react-router-dom";
-
+import api from "../../../api/axiosInstance";
 const OTP = () => {
 
   const [otp, setOtp] = useState('');
   const navigate = useNavigate()
      
-  const handleVerify = async (e) => {
-    e.preventDefault();
-    const email = localStorage.getItem('pendingEmail');
-    const flow = localStorage.getItem('otpFlow'); // register OR reset
+  // const handleVerify = async (e) => {
+  //   e.preventDefault();
+  //   const email = localStorage.getItem('pendingEmail');
+  //   const flow = localStorage.getItem('otpFlow'); // register OR reset
 
-    if (!email) {
-      alert("Email not found. Please restart the process.");
-      return;
+  //   if (!email) {
+  //     alert("Email not found. Please restart the process.");
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await fetch('http://careboxapi.runasp.net/api/Auth/verify-otp', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ email, otpCode: otp }),
+  //     });
+
+  //     if (response.ok) {
+  //       if (flow === 'reset') {
+  //         // حفظ الـ OTP عشان نبعته مع الباسوورد الجديد
+  //         localStorage.setItem('resetOtp', otp);
+  //         navigate('/createnewpass');
+  //       } else {
+  //         alert("✅ Account Verified!");
+  //         localStorage.removeItem('otpFlow');
+  //         navigate('/');
+  //       }
+  //       // تنظيف الـ Flag بعد الاستخدام (اختياري)
+  //         localStorage.removeItem('otpFlow');
+  //     }
+  //      else {
+  //       alert("❌ Invalid OTP. Try again.");
+  //     }
+  //   } catch {
+  //     alert("Server error.");
+  //   }
+  // };
+
+ const handleVerify = async (e) => {
+  e.preventDefault();
+  const email = localStorage.getItem('pendingEmail');
+  const flow = localStorage.getItem('otpFlow');
+
+  try {
+    await api.post('/Auth/verify-otp', { email, otpCode: otp });
+    
+    if (flow === 'reset') {
+      localStorage.setItem('resetOtp', otp);
+      navigate('/createnewpass');
+    } else {
+      alert("✅ Account Verified!");
+      navigate('/');
     }
-
-    try {
-      const response = await fetch('http://careboxapi.runasp.net/api/Auth/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otpCode: otp }),
-      });
-
-      if (response.ok) {
-        if (flow === 'reset') {
-          // حفظ الـ OTP عشان نبعته مع الباسوورد الجديد
-          localStorage.setItem('resetOtp', otp);
-          navigate('/createnewpass');
-        } else {
-          alert("✅ Account Verified!");
-          localStorage.removeItem('otpFlow');
-          navigate('/');
-        }
-        // تنظيف الـ Flag بعد الاستخدام (اختياري)
-          localStorage.removeItem('otpFlow');
-      }
-       else {
-        alert("❌ Invalid OTP. Try again.");
-      }
-    } catch {
-      alert("Server error.");
-    }
-  };
+    localStorage.removeItem('otpFlow');
+  } catch{
+    alert("❌ Invalid OTP. Try again.");
+  }
+ };
 
   return (
 
@@ -70,7 +91,7 @@ const OTP = () => {
           />
         </div>
         <button type="submit" className="rounded text-danger bg-black p-3 w-100">Verify</button>
-        {/* <p className="text-center">Didn't received code? <bold className="text-danger">Resend</bold></p> */}
+        {/* <p className="text-center">Didn't received code? <label className="text-danger">Resend</label></p> */}
 
       </form>
 

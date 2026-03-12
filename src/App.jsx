@@ -12,7 +12,6 @@ import CreateNewPass from "./pages/Authentication-pages/CreateNewPass/CreateNewP
 
 // main
 import MainLayout from "./layouts/MainLayout";
-import EditProfile from "./pages/EditProfile/EditProfile";
 import Home from "./pages/home/Home";
 import Bookings from './pages/bookings/bookings'
 import Clients from './pages/clients/clients'
@@ -46,7 +45,6 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/otp" element={<OTP/>} />
           <Route path="/createnewpass" element={<CreateNewPass/>}/>
-          <Route path="/editProfile" element={<EditProfile/>} />
           <Route path='/forgotPass' element={<ForgotPass/>}/>
         </Route>
 

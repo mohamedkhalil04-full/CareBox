@@ -1,7 +1,7 @@
 import "./CreateNewPass.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import api from "../../../api/axiosInstance";
 const CreateNewPass = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
@@ -20,10 +20,10 @@ const CreateNewPass = () => {
     const otpCode = localStorage.getItem('resetOtp');
 
     try {
-      const response = await fetch('http://careboxapi.runasp.net/api/Auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otpCode, newPassword: password }),
+      const response = await api.post('/Auth/reset-password', {
+        email,
+        otpCode,
+        newPassword: password
       });
 
       if (response.ok) {
@@ -44,7 +44,7 @@ const CreateNewPass = () => {
       <h2>Create New Password</h2>
       <small>Your new password must be unique from those previously used.</small>
       <div className="newpassinputs d-flex flex-column gap-3 w-100 my-4">
-        
+
         <div className="form-floating">
           <input
             type={showPassword ? "text" : "password"}
@@ -71,7 +71,7 @@ const CreateNewPass = () => {
             Show Password
           </label>
         </div>
-        
+
         <div className="form-floating">
           <input
             type={showPassword ? "text" : "password"}
