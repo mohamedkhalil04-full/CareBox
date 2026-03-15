@@ -17,6 +17,7 @@ const Login = () => {
       
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("isLoggedIn", "true");
+      // localStorage.setItem("userRole", response.data.providerTypeId); // دي عشان نوع المستخدم
       alert("✅ Welcome Back!");
       navigate("/home");
     } catch (error) {
@@ -24,29 +25,7 @@ const Login = () => {
       alert(`❌ ${errorMsg}`);
     }
   };
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     const response = await fetch('http://careboxapi.runasp.net/api/Auth/login', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({ email, password }),
-  //     });
-
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       localStorage.setItem("token", data.token); // حفظ التوكن للطلبات الجاية
-  //       localStorage.setItem("isLoggedIn", "true");
-  //       alert("✅ Welcome Back!");
-  //       navigate("/home");
-  //     } else {
-  //       alert("❌ Invalid email or password");
-  //     }
-  //   } catch {
-  //     alert("Server is down! please check your connection and try again. ");
-  //   }
-  // };
+  
   return (
     <form onSubmit={handleSubmit} className="carebox-container p-2 mx-auto my-2 rounded  d-flex flex-column">
 

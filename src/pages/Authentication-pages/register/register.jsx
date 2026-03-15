@@ -2,7 +2,7 @@
 import "./register.css";
 import api from '../../../api/axiosInstance'
 import { useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate , Link } from "react-router-dom";
 import { useForm, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -140,9 +140,9 @@ export default function Register() {
                 <div className="pt-3">
                   <p className="text-center">
                     Already have an account?{" "}
-                    <a className="text-decoration-none " href="/">
+                    <Link className="text-decoration-none " href="/">
                       <label className="text-danger">Login Now</label>
-                    </a>
+                    </Link>
                   </p>
                 </div>
               </Form>

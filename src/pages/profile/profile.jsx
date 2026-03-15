@@ -1,24 +1,23 @@
 import "./profile.css";
 
 const Profile = () => {
+
+
   return (
-   
 
-    <div className="container my-5">
-      <div className="card-header my-5 mx-5 ">
-          <h2 className="mb-0 fw-bolder">Workshop Profile</h2>
-        </div>
+    <div className="container w-75">
+      <div className="card-header my-4">
+        <h4 className="mb-0 fw-bolder">Workshop Profile</h4>
+      </div>
       <div className="card shadow">
-        
-
         <div className="card-body">
-          <h5 className="mb-4 border-bottom pb-2">General Information</h5>
+          <h5 className="mb-2 border-bottom pb-1">General Information</h5>
 
           {/* Logo */}
-          <div className="mb-4">
+          <div className="mb-2">
             <label className="form-label">Workshop Logo</label>
             <div className="d-flex align-items-center gap-3">
-              <div 
+              <div
                 className="rounded-circle bg-light d-flex align-items-center justify-content-center text-muted"
                 style={{ width: '100px', height: '100px' }}
               >
@@ -33,9 +32,9 @@ const Profile = () => {
           {/* Name */}
           <div className="mb-3">
             <label className="form-label">Workshop Name</label>
-            <input 
-              type="text" 
-              className="form-control" 
+            <input
+              type="text"
+              className="form-control"
               defaultValue="AutoFix Workshop"
             />
           </div>
@@ -44,9 +43,9 @@ const Profile = () => {
           <div className="mb-3">
             <label className="form-label">Address</label>
             <div className="input-group">
-              <input 
-                type="text" 
-                className="form-control" 
+              <input
+                type="text"
+                className="form-control"
                 defaultValue="Third district, Obour city, Cairo"
               />
               <button className="btn btn-outline-secondary mx-5 rounded-4 fa-location-dot" type="button">
@@ -59,17 +58,17 @@ const Profile = () => {
           <div className="row mb-3">
             <div className="col-md-6">
               <label className="form-label">Phone Number</label>
-              <input 
-                type="tel" 
-                className="form-control" 
+              <input
+                type="tel"
+                className="form-control"
                 defaultValue="+20 111 222 333"
               />
             </div>
             <div className="col-md-6">
               <label className="form-label">Email Address</label>
-              <input 
-                type="email" 
-                className="form-control" 
+              <input
+                type="email"
+                className="form-control"
                 defaultValue="contact@autofixworkshop.com"
               />
             </div>
@@ -78,8 +77,8 @@ const Profile = () => {
           {/* Working Hours */}
           <div className="mb-4">
             <label className="form-label">Working Hours</label>
-            <textarea 
-              className="form-control" 
+            <textarea
+              className="form-control"
               rows="3"
               defaultValue="Mon-Fri: 8:00 AM - 6:00 PM, Sat: 9:00 AM - 2:00 PM"
             ></textarea>
@@ -100,3 +99,5 @@ const Profile = () => {
 };
 
 export default Profile;
+
+
