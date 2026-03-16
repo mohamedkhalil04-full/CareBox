@@ -53,7 +53,7 @@ const Clients = () => {
 <>
     <div className="clients-container p-4">
       <div className="d-flex justify-content-between align-items-center mb-2">
-        <h2 className="mb-3 fw-bolder m-0">Clients</h2>
+        <h3 className=" fw-bolder m-0">Clients</h3>
         <button className="btn btn-danger px-3" id="btn-to-add-client">
           + Add Client
         </button>
