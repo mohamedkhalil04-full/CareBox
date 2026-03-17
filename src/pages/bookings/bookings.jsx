@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from "react";
 import api from "../../api/axiosInstance";
-import { Badge, Button, Form, InputGroup, Dropdown, DropdownButton } from "react-bootstrap";
+import { Badge, Button, Form, InputGroup, Dropdown } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+// Map للـ status (بناءً على الداتا الحقيقية: string مش رقم)
 const STATUS_MAP = {
-  1: { label: "Pending", variant: "warning" },
-  2: { label: "Approved", variant: "primary" },
-  3: { label: "Cancelled", variant: "danger" },
-  4: { label: "Completed", variant: "success" },
+  Pending: { label: "Pending", variant: "warning" },
+  Approved: { label: "Approved", variant: "primary" },
+  Cancelled: { label: "Cancelled", variant: "danger" },
+  Completed: { label: "Completed", variant: "success" },
 };
 
 const Bookings = () => {
   const [bookings, setBookings] = useState([]);
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState(null); // null = all
+  const [selectedStatus, setSelectedStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -26,10 +27,8 @@ const Bookings = () => {
       const res = await api.get(`/Bookings/ProviderBookings${query}`);
 
       let data = res.data;
-
-      // التعامل مع أشكال الـ response المختلفة
       if (data && typeof data === "object" && !Array.isArray(data)) {
-        data = data.data || data.bookings || data.result || data.items || [];
+        data = data.data || data.bookings || data.result || [];
       }
 
       const safeBookings = Array.isArray(data) ? data : [];
@@ -37,7 +36,7 @@ const Bookings = () => {
       setFilteredBookings(safeBookings);
     } catch (err) {
       console.error("Error fetching bookings:", err);
-      setError("error while fetching bookings");
+      setError("an error occures while fetching bookings");
       setBookings([]);
       setFilteredBookings([]);
     } finally {
@@ -49,110 +48,150 @@ const Bookings = () => {
     fetchBookings(selectedStatus);
   }, [selectedStatus]);
 
-  // فلتر البحث المحلي
+  // فلتر البحث
   useEffect(() => {
     let result = [...bookings];
-
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       result = result.filter((b) => {
-        const searchFields = [
-          b.bookingId?.toString(),
+        return [
+          b.bookingCode,
           b.clientName,
-          b.clientFullName,
-          b.carType,
-          b.carModel,
-          b.serviceType,
-        ].filter(Boolean).join(" ").toLowerCase();
-
-        return searchFields.includes(term);
+          b.vehicleDetails,
+          ...(b.servicesIncluded || []),
+        ].join(" ").toLowerCase().includes(term);
       });
     }
-
     setFilteredBookings(result);
   }, [searchTerm, bookings]);
 
-  const updateStatus = async (bookingId, newStatus) => {
-    const statusLabel = STATUS_MAP[newStatus]?.label || newStatus;
-    if (!window.confirm(`confirm changing state to ${statusLabel}?`)) return;
+  const statusToNumber = {
+  "Pending": 1,
+  "Approved": 2,
+  "Cancelled": 3,
+  "Completed": 4,
+};
 
-    try {
-      await api.patch("/Bookings/UpdateStatus", {
-        bookingId,
-        status: newStatus,
-      });
-      fetchBookings(selectedStatus); // refresh
-    } catch (err) {
-      console.error("Update failed:", err);
-      alert("refresh state failed");
-    }
+const updateStatus = async (bookingId, newStatusString) => {
+  const newStatusNumber = statusToNumber[newStatusString];
+  
+  if (!newStatusNumber) {
+    alert("unknown status");
+    return;
+  }
+
+  const payload = {
+    bookingId: bookingId,
+    status: newStatusNumber,
   };
 
-  const getActions = (booking) => {
-    const status = booking.status;
+  // console.log("Sending PATCH payload:", payload);
 
-    if (status === 1) {
-      return (
-        <div className="d-flex gap-2">
-          <Button
-            variant="success"
-            size="sm"
-            className="py-1 px-3"
-            onClick={() => updateStatus(booking.bookingId, 2)}
-          >
-            Approve
-          </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            className="py-1 px-3"
-            onClick={() => updateStatus(booking.bookingId, 3)}
-          >
-            Cancel
-          </Button>
-        </div>
-      );
+  if (!window.confirm(`are you sure you want to change the status to ${newStatusString}?`)) {
+    return; // لو لا نطلع من الدالة
+  }
+
+  try {
+    const response = await api.patch("/Bookings/UpdateStatus", payload);
+    
+    // لو وصلنا هنا يبقى الطلب نجح (status 200-299)
+    console.log("Update success:", response.data); // لو في رد مفيد نشوفه
+
+    fetchBookings(selectedStatus);
+    alert(`status changed successfully to ${newStatusString}`);
+  } catch (err) {
+    console.error("Update failed:", err);
+    
+    // هنا بنحاول نطلّع الرسالة الحقيقية من السيرفر
+    let errorMessage = "changes failed";
+    
+    if (err.response) {
+      
+      const serverMsg = err.response.data?.message 
+        || err.response.data?.error 
+        || err.response.data 
+        || "Bad Request (400)";
+      
+      errorMessage += `: ${serverMsg}`;
+      console.log("Server error details:", err.response.data);
+    } else if (err.request) {
+      errorMessage += " (No response from the server)";
+    } else {
+      errorMessage += `: ${err.message}`;
     }
 
-    if (status === 2) {
-      return (
+    alert(errorMessage);
+  }
+};
+
+  const getActions = (booking) => {
+  const status = booking.status?.trim(); // "Pending", "Approved", ...
+
+  if (status === "Pending") {
+    return (
+      <div className="d-flex gap-2">
         <Button
           variant="success"
           size="sm"
-          className="py-1 px-3"
-          onClick={() => updateStatus(booking.bookingId, 4)}
+          onClick={() => updateStatus(booking.bookingId, "Approved")}
         >
-          Complete
+          Approve
         </Button>
-      );
-    }
+        <Button
+          variant="danger"
+          size="sm"
+          onClick={() => updateStatus(booking.bookingId, "Cancelled")}
+        >
+          Cancel
+        </Button>
+      </div>
+    );
+  }
 
-    return null;
-  };
+  if (status === "Approved") {
+    return (
+      <Button
+        variant="success"
+        size="sm"
+        onClick={() => updateStatus(booking.bookingId, "Completed")}
+      >
+        Complete
+      </Button>
+    );
+  }
+
+  return null;
+};
 
   const getServiceDisplay = (booking) => {
-    if (booking.serviceType) return booking.serviceType;
-
-    if (Array.isArray(booking.services)) {
-      return booking.services
-        .map((s) => s.serviceName || s.name || "unknown service")
-        .join(", ");
+    if (Array.isArray(booking.servicesIncluded) && booking.servicesIncluded.length > 0) {
+      return booking.servicesIncluded.join(", ");
     }
-
-    if (Array.isArray(booking.serviceNames)) {
-      return booking.serviceNames.join(", ");
-    }
-
     return "—";
+  };
+
+  const formatDateTime = (dateStr) => {
+    if (!dateStr) return "—";
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+    } catch {
+      return dateStr;
+    }
   };
 
   return (
     <div className="p-4" style={{ backgroundColor: "#f8f9fa" }}>
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <h3 className="fw-bold">Bookings</h3>
-        <Button variant="danger" className="px-4">   {/*  style={{backgroundColor:'red'}}  */}
-          + New Booking
-        </Button>
+        <Button variant="danger" className="px-4">+ New Booking</Button>
       </div>
 
       <div className="d-flex flex-wrap gap-3 mb-4">
@@ -166,18 +205,13 @@ const Bookings = () => {
 
         <Dropdown>
           <Dropdown.Toggle variant="outline-secondary">
-            {selectedStatus !== null
-              ? STATUS_MAP[selectedStatus]?.label || "Unknown"
-              : "Filter by Status"}
+            {selectedStatus || "Filter by Status"}
           </Dropdown.Toggle>
-
           <Dropdown.Menu>
-            <Dropdown.Item onClick={() => setSelectedStatus(null)}>
-              All Statuses
-            </Dropdown.Item>
-            {Object.entries(STATUS_MAP).map(([key, value]) => (
-              <Dropdown.Item key={key} onClick={() => setSelectedStatus(Number(key))}>
-                {value.label}
+            <Dropdown.Item onClick={() => setSelectedStatus(null)}>All Statuses</Dropdown.Item>
+            {Object.keys(STATUS_MAP).map((key) => (
+              <Dropdown.Item key={key} onClick={() => setSelectedStatus(key)}>
+                {STATUS_MAP[key].label}
               </Dropdown.Item>
             ))}
           </Dropdown.Menu>
@@ -207,37 +241,36 @@ const Bookings = () => {
             <tbody>
               {!Array.isArray(filteredBookings) || filteredBookings.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="text-center text-muted py-5">
+                  <td colSpan="6" className="text-center text-muted py-5">
                     No bookings yet
                   </td>
                 </tr>
               ) : (
-                filteredBookings.map((booking) => (
-                  <tr key={booking.bookingId || `booking-${Math.random()}`}>
-                    <td className="fw-medium">{booking.bookingId || "—"}</td> {/*booking id */}
-                    <td>{booking.clientName || booking.clientFullName || "—"}</td> {/* client name */}
-                    <td>{booking.carType || booking.carModel || "—"}</td> {/* car type */}
-                    <td>{getServiceDisplay(booking)}</td>  {/* service type */}
-                    <td>  {/* date & time */}
-                      {booking.bookingDateTime ||
-                        booking.date ||
-                        booking.bookingDate ||
-                        "—"}
-                    </td>
-                    <td className="text-nowrap">
-                      <div className="d-flex align-items-center gap-3 flex-wrap">
-                        <Badge
-                          bg={STATUS_MAP[booking.status]?.variant || "secondary"}
-                          className="px-3 py-2 fs-6"
-                        >
-                          {STATUS_MAP[booking.status]?.label || "unknown"}
-                        </Badge>
-
-                        {getActions(booking)}
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                filteredBookings.map((booking) => {
+      // console.log("Full booking object:", booking); // عشان كنت عايز اتأكد ان طلعت ضاف البيانات بتاعته بنجاح
+                  return (
+                    <tr key={booking.bookingId || Math.random()}>
+                      <td className="fw-medium">
+                        {booking.bookingCode || `BK-${String(booking.bookingId).padStart(4, "0")}`}
+                      </td>
+                      <td>{booking.clientName || "—"}</td>
+                      <td>{booking.vehicleDetails || "—"}</td>
+                      <td>{getServiceDisplay(booking)}</td>
+                      <td>{formatDateTime(booking.appointmentDateTime)}</td>
+                      <td className="text-nowrap">
+                        <div className="d-flex align-items-center gap-3 flex-wrap">
+                          <Badge
+                            bg={STATUS_MAP[booking.status]?.variant || "secondary"}
+                            className="px-3 py-2 fs-6"
+                          >
+                            {booking.status || "Unknown"}
+                          </Badge>
+                          {getActions(booking)}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
