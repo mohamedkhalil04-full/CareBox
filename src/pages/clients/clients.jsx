@@ -89,8 +89,8 @@ const Clients = () => {
 
       {loading ? (
         <div className="text-center py-5">
-          <Spinner animation="border" variant="danger" />
-          <p className="mt-3 text-muted">جاري تحميل بيانات العملاء...</p>
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-3 text-muted">loading clients data...</p>
         </div>
       ) : (
         <div className="table-responsive shadow-sm rounded bg-white">

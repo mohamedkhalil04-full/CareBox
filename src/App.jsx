@@ -19,6 +19,7 @@ import Services from './pages/services/services'
 import Reviews from './pages/reviews/reviews'
 import Profile from './pages/profile/profile'
 import Settings from './pages/settings/settings'
+import About from "./pages/About/About";
 
 
 // not found
@@ -36,6 +37,7 @@ function App() {
           <Route path="/services" element={<Services />} />
           <Route path="/reviews" element={<Reviews />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/about" element={<About />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
 

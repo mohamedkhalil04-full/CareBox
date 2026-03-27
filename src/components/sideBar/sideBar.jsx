@@ -57,7 +57,7 @@ const handleLogout = async () => {
 
     return (
     
-    <aside className="bg-white d-flex flex-column p-3 vh-100" style={{ width: '260px' , borderRight:'1px gray solid', }}>
+    <aside className="bg-white d-flex flex-column p-3 vh-100" style={{borderRight:'1px gray solid'}}>
      
       <div className="d-flex flex-column align-items-center  mb-5 mt-2">
         <i class="fa-solid fa-car p-1"></i>
@@ -95,6 +95,11 @@ const handleLogout = async () => {
         <li className="nav-item ">
           <NavLink style={activeStyle} to="/profile" className="nav-link ">
             <i className="me-2 "><i class="fa-regular fa-user"></i></i> Profile
+          </NavLink>
+        </li>
+        <li className="nav-item ">
+          <NavLink style={activeStyle} to="/about" className="nav-link  ">
+            <i className="me-2 "><i class="fa-solid fa-award"></i></i> About Us
           </NavLink>
         </li>
         <li className="nav-item ">
