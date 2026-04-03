@@ -140,9 +140,9 @@ export default function Register() {
                 <div className="pt-3">
                   <p className="text-center">
                     Already have an account?{" "}
-                    <Link className="text-decoration-none " href="/">
-                      <label className="text-danger">Login Now</label>
-                    </Link>
+                    <a className="text-decoration-none " href="/">
+                      <label className="text-danger" style={{cursor:"pointer"}}>Login Now</label>
+                    </a>
                   </p>
                 </div>
               </Form>

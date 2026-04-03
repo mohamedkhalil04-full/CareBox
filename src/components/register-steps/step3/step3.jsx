@@ -242,7 +242,7 @@ const Step3 = () => {
         <label>Address</label>
         {errors.address && <FormText className="text-danger">{errors.address.message}</FormText>}
       </FormGroup>
-      <label><a target='_blank' style={{textDecoration:"none",color:'black',padding:'-2px'}} href="https://www.google.com/maps/">open google maps<i class="fa-solid fa-location-dot"></i></a></label>
+      <label><a target='_blank' style={{textDecoration:"none",padding:'-2px'}} href="https://www.google.com/maps/">open google maps<i class="fa-solid fa-location-dot"></i></a> and please enter the "full URL"</label>
       
       <FormGroup className="form-floating mb-3">
         <FormControl

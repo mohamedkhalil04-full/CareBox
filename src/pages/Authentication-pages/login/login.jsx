@@ -92,7 +92,7 @@ const Login = () => {
         <p className="text-center ">
           Don't have an account?{" "}
           <a className="text-decoration-none " href="/register">
-            <label className="text-danger">Register Now</label>
+            <label className="text-danger" style={{cursor:'pointer'}}>Register Now</label>
           </a>
         </p>
       </div>
