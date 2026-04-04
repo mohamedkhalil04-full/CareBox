@@ -133,14 +133,14 @@ const Services = () => {
                         onClick={() => handleEditClick(service)}
                         className="btn btn-sm btn-link text-white bg-success text-decoration-none p-1 d-flex align-items-center gap-1"
                       >
-                        Edit <i class="fa-solid fa-pen-to-square"></i> (disabled now)
+                        Edit <i class="fa-solid fa-pen-to-square"></i> (comming soon)
                       </button>
                       <button
                       disabled
                         onClick={() => handleDelete(service.id)}
                         className="btn btn-sm btn-link text-white bg-danger text-decoration-none p-1 d-flex align-items-center gap-1"
                       >
-                        Delete <i class="fa-solid fa-trash"></i> (disabled now)
+                        Delete <i class="fa-solid fa-trash"></i> (comming soon)
                       </button>
                     </div>
                   </div>

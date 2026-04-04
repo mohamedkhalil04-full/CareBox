@@ -28,7 +28,7 @@ const Bookings = () => {
 
       let data = res.data;
       if (data && typeof data === "object" && !Array.isArray(data)) {
-        data = data.data || data.bookings || data.result || [];
+        data = data.data || [];
       }
 
       const safeBookings = Array.isArray(data) ? data : [];

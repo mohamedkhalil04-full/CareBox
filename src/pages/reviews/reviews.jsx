@@ -1,74 +1,119 @@
+import React, { useState, useEffect } from "react";
+import api from "../../api/axiosInstance";
 import "./reviews.css";
+
 const Stars = ({ rating }) => {
   return (
-    <div className="text-warning">
-      {"★".repeat(rating)}
-      {"☆".repeat(5 - rating)}
+    <div className="text-warning fs-5">
+      {"★".repeat(Math.floor(rating))}
+      {rating % 1 !== 0 && "½"}
+      {"☆".repeat(5 - Math.floor(rating))}
     </div>
   );
 };
-const reviews = [
-  {
-    name: "Ahmed Mohamed",
-    time: "2 days ago",
-    rating: 5,
-    text: "Excellent service! They were quick, transparent about pricing, and my car runs perfectly now.",
-  },
-  {
-    name: "Manal Ahmed",
-    time: "1 week ago",
-    rating: 4,
-    text: "Good experience overall. The oil change was fast, but I had to wait longer than expected.",
-  },
-  {
-    name: "Revan Taher",
-    time: "2 weeks ago",
-    rating: 5,
-    text: "Honest mechanics are hard to find. These guys told me I didn't actually need a repair.",
-  },
-  {
-    name: "Ziyad Niazy",
-    time: "1 month ago",
-    rating: 5,
-    text: "Very professional workshop. The waiting area is clean and they explained everything.",
-  },
-  {
-    name: "Saeed Mohamed",
-    time: "1 month ago",
-    rating: 3,
-    text: "The repair work was solid, but communication could be better.",
-  },
-  {
-    name: "Said Hamed",
-    time: "2 months ago",
-    rating: 5,
-    text: "Fantastic team! Brought my SUV in for a major service and they handled it perfectly.",
-  },
-];
+
+// تحويل التاريج و الوقت ل فترة عدت
+const timeAgo = (dateString) => {
+  if (!dateString) return "time ago";
+
+  const date = new Date(dateString);
+  const now = new Date();
+  const seconds = Math.floor((now - date) / 1000);
+
+  let interval = Math.floor(seconds / 31536000);
+  if (interval >= 1) return interval === 1 ? "1 year ago" : `${interval} years ago`;
+
+  interval = Math.floor(seconds / 2592000);
+  if (interval >= 1) return interval === 1 ? "1 month ago" : `${interval} months ago`;
+
+  interval = Math.floor(seconds / 86400);
+  if (interval >= 1) return interval === 1 ? "1 day ago" : `${interval} weeks ago`;
+
+  interval = Math.floor(seconds / 3600);
+  if (interval >= 1) return interval === 1 ? "1 hour ago" : `${interval} days ago`;
+
+  interval = Math.floor(seconds / 60);
+  if (interval >= 1) return interval === 1 ? "1 minute" : `${interval} minutes ago`;
+
+  return "seconds ago";
+};
 
 const Reviews = () => {
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await api.get("/Reviews/ProvidertReviews");
+
+        let data = res.data;
+        // التعامل مع wrapped response
+        if (data && typeof data === "object" && !Array.isArray(data)) {
+          data = data.data || data.reviews || data.result || [];
+        }
+
+        const safeReviews = Array.isArray(data) ? data : [];
+        setReviews(safeReviews);
+      } catch (err) {
+        console.error("Error fetching reviews:", err);
+        setError("an error occurs while fetching reviews");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, []);
+
   return (
-    <div className="container mt-5">
-      <h2 className="mb-5 fw-bolder">Reviews</h2>
-
-      <div className="row">
-        {reviews.map((review, index) => (
-          <div className="col-md-4 mb-4" key={index}>
-            <div className="card p-3 review-card">
-              <div className="d-flex justify-content-between">
-                <div>
-                  <h6 className="mb-2 fw-bold">{review.name}</h6>
-                  <small className="text-muted">{review.time}</small>
-                </div>
-
-                <Stars rating={review.rating} />
-              </div>
-
-              <p className="mt-3 text-muted">"{review.text}"</p>
-            </div>
-          </div>
-        ))}
+    <div className="container mt-4">
+      <div className="d-flex justify-content-between align-items-center mb-5">
+        <h2 className="fw-bold">Reviews</h2>
+        <span className="text-muted">
+          {reviews.length} reviews
+        </span>
       </div>
+
+      {error && <div className="alert alert-danger">{error}</div>}
+
+      {loading ? (
+        <div className="text-center py-5">
+          <div className="spinner-border text-danger" role="status" />
+          <p className="mt-3">loading reviews...</p>
+        </div>
+      ) : reviews.length === 0 ? (
+        <div className="text-center py-5 text-muted">
+          <h5>No reviews yet</h5>
+        </div>
+      ) : (
+        <div className="row g-4">
+          {reviews.map((review, index) => (
+            <div className="col-lg-4 col-md-6" key={index}>
+              <div className="card h-100 review-card shadow-sm border-0">
+                <div className="card-body p-4">
+                  <div className="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                      <h6 className="fw-bold mb-1">{review.clientName || "client"}</h6>
+                      <small className="text-muted">
+                        {timeAgo(review.createdAt)}
+                      </small>
+                    </div>
+                    <Stars rating={review.rating || 0} />
+                  </div>
+
+                  <p className="text-muted mb-0 review-text">
+                    "{review.comment || "no comment"}"
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

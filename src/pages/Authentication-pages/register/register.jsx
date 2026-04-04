@@ -22,22 +22,8 @@ const schema = yup.object({
   providerType: yup.string().required('the provider type is required'),
 
   name: yup.string().required('the name is required'),
-
-  phone: yup.string().required('Phone number is required'),
-
-  image: yup.mixed().optional(),
-
-  address: yup.string().required('the Address is required'),
-
-  location: yup.string().url('invalid URL').required('url location is required'),
-  latitude: yup.string().nullable(),
-  longitude: yup.string().nullable(),
-
-  workingFrom: yup.string().required('opening time is required'),
-  workingTo: yup.string().required('closing time is required'),
-
   email: yup.string().email('invalid email').required('email is required'),
-
+  phone: yup.string().required('Phone number is required'),
   password: yup.string()
    .min(8,'password must be at least 8 digits')
    .matches(/[^a-zA-Z0-9]/, 'password must has at least 1 symbol like -> (@#$%^&*...)')
@@ -50,6 +36,14 @@ const schema = yup.object({
     .oneOf([yup.ref('password')], 'Passwords must match')
     .required('confirming password is required'),
     
+  address: yup.string().required('the Address is required'),
+  location: yup.string().url('invalid URL').required('url location is required'),
+  latitude: yup.string().nullable(),
+  longitude: yup.string().nullable(),
+  workingFrom: yup.string().required('opening time is required'),
+  workingTo: yup.string().required('closing time is required'),  
+  image: yup.mixed().optional(),
+  
 }).required();
 
 export default function Register() {
@@ -80,20 +74,17 @@ export default function Register() {
     formData.append('ProviderTypeId', typeId);
 
     formData.append('Name', data.name);
+    formData.append('Email', data.email);
     formData.append('PhoneNumber', data.phone);
+    formData.append('Password', data.password);
+    formData.append('ConfirmPassword', data.confirmPassword);
+
     formData.append('Address', data.address);
     formData.append('LocationUrl', data.location);
-
     // إرسال الإحداثيات المستخرجة تلقائياً من ملف location-fun
     formData.append('Latitude', data.latitude || "");
     formData.append('Longitude', data.longitude || "");
-
     formData.append('WorkingHours', `${data.workingFrom} - ${data.workingTo}`);
-    formData.append('Email', data.email);
-    formData.append('Password', data.password);
-
-    formData.append('ConfirmPassword', data.confirmPassword);
-
     if (data.image && data.image[0]) {
       formData.append('Image', data.image[0]);
     }

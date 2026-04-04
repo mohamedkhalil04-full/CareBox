@@ -23,7 +23,7 @@ const Clients = () => {
 
         // التعامل مع الـ response لو wrapped
         if (data && typeof data === "object" && !Array.isArray(data)) {
-          data = data.data || data.clients || data.result || data.items || [];
+          data = data.data || [];
         }
 
         const safeClients = Array.isArray(data) ? data : [];

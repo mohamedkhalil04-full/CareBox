@@ -32,10 +32,10 @@ const Profile = () => {
         const data = res.data || {};
 
         const initial = {
-          shopName: data.shopName || data.name || "",
+          shopName: data.shopName || "",
           name: data.name || "",
           address: data.address || "",
-          phone: data.phone || data.phoneNumber || "",
+          phone: data.phoneNumber || "",
           email: data.email || "",
           workingHours: data.workingHours || "",
           logoUrl: data.logoUrl || data.logo || data.image || "",

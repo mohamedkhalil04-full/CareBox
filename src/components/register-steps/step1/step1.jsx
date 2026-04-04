@@ -40,9 +40,9 @@ const Step1=()=> {
     },
   ];
 
-    const handleSelect = (serviceTitle) => {
+    const handleSelect = (serviceId) => {
      // تحديث قيمة الـ Form الرئيسي
-     setValue('providerType', serviceTitle, { shouldValidate: true });
+     setValue('providerType', serviceId, { shouldValidate: true });
     };
 
 
@@ -58,9 +58,9 @@ const Step1=()=> {
               type="button"
               // هنا بنقارن القيمة المختارة بالعنوان عشان نلون الزرار
               className={`service-type-btn btn w-100 h-100 text-start p-3 border rounded-3 transition-all ${
-                currentSelection === service.title ? 'border-danger shadow-sm bg-light' : 'border-light'
+                currentSelection === service.id ? 'border-danger shadow-sm bg-light' : 'border-light'
               }`}
-              onClick={() => handleSelect(service.title)} // إضافة حدث الضغط
+              onClick={() => handleSelect(service.id)} // إضافة حدث الضغط
             >
               <div className="d-flex flex-column align-items-center text-center ">
                 <div
