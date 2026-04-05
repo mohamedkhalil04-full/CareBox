@@ -85,13 +85,21 @@ export default function Register() {
     formData.append('Latitude', data.latitude || "");
     formData.append('Longitude', data.longitude || "");
     formData.append('WorkingHours', `${data.workingFrom} - ${data.workingTo}`);
-    if (data.image && data.image[0]) {
-      formData.append('Image', data.image[0]);
+    // if (data.image && data.image[0]) {
+    //   formData.append('Image', data.image[0]);
+    // }
+    if (data.image) {
+      formData.append('LogoImage', data.image);
     }
 
     try {
       // لاحظ أننا نرسل الـ formData مباشرة كـ Parameter ثاني
-      const response = await api.post('/Auth/register/provider', formData);
+      // const response = await api.post('/Auth/register/provider', formData);
+      const response = await api.post('/Auth/register/provider', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
       // في Axios، البيانات تكون موجودة في response.data
       if (response.status === 200 || response.status === 201) {
         localStorage.setItem('pendingEmail', data.email);
@@ -99,7 +107,8 @@ export default function Register() {
         alert('Success! Check your email for OTP.');
         navigate('/otp');
       }
-    } catch {
+    } catch(error) {
+      console.error("Backend Validation Error:", error.response?.data);
       alert('Network error, please check your connection.');
     }
   };
