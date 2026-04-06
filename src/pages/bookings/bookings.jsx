@@ -191,7 +191,7 @@ const updateStatus = async (bookingId, newStatusString) => {
     <div className="p-4" style={{ backgroundColor: "#f8f9fa" }}>
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <h3 className="fw-bold">Bookings</h3>
-        <Button variant="danger" className="px-4">+ New Booking</Button>
+        {/* <Button variant="danger" className="px-4">+ New Booking</Button> */}
       </div>
 
       <div className="d-flex flex-wrap gap-3 mb-4">
@@ -230,7 +230,7 @@ const updateStatus = async (bookingId, newStatusString) => {
           <table className="table table-hover align-middle mb-0 bg-white">
             <thead className="table-light">
               <tr>
-                <th>Booking ID</th>
+                <th>Booking Code</th>
                 <th>Client Name</th>
                 <th>Car Type</th>
                 <th>Service Type</th>

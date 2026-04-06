@@ -122,7 +122,7 @@ const Services = () => {
                     <div className="d-flex justify-content-between align-items-center mb-2">
                       <h6 className="m-0 fw-bold">{service.serviceName}</h6>
                       <span className="fw-bold" style={{ color: "#ff4d4f" }}>
-                        ${Number(service.price || 0).toFixed(2)}
+                        {Number(service.price || 0).toFixed(2)}L.E
                       </span>
                     </div>
                     <p className="text-muted small mb-3">{service.description || "No description provided"}</p>

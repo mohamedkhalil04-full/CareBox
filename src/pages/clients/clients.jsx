@@ -71,9 +71,9 @@ const Clients = () => {
     <div className="p-4" style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <h2 className="fw-bold mb-0">Clients</h2>
-        <Button variant="danger" className="px-4 fw-semibold">
+        {/* <Button variant="danger" className="px-4 fw-semibold">
           + Add Client
-        </Button>
+        </Button> */}
       </div>
 
       {/* Search */}

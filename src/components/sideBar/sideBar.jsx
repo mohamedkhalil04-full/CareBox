@@ -107,6 +107,11 @@ const handleLogout = async () => {
             <i className="me-2 "><i class="fa-solid fa-gear"></i></i> Settings
           </NavLink>
         </li>
+        <li className="nav-item ">
+          <NavLink style={activeStyle} to="/invoices" className="nav-link ">
+            <i className="me-2 "><i class="fa-solid fa-gear"></i></i> invoices
+          </NavLink>
+        </li>
       </ul>
 
       <hr className="text-dark-50"/>

@@ -20,7 +20,7 @@ import Reviews from './pages/reviews/reviews'
 import Profile from './pages/profile/profile'
 import Settings from './pages/settings/settings'
 import About from "./pages/About/About";
-
+import Invoices from "./pages/invoices/invoices";
 
 // not found
 import NotFound from "./pages/NotFound/NotFound";
@@ -39,6 +39,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/about" element={<About />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/invoices" element={<Invoices/>}/>
         </Route>
 
         {/* authontication*/}

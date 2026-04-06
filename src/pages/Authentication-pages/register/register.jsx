@@ -85,16 +85,11 @@ export default function Register() {
     formData.append('Latitude', data.latitude || "");
     formData.append('Longitude', data.longitude || "");
     formData.append('WorkingHours', `${data.workingFrom} - ${data.workingTo}`);
-    // if (data.image && data.image[0]) {
-    //   formData.append('Image', data.image[0]);
-    // }
     if (data.image) {
       formData.append('LogoImage', data.image);
     }
 
     try {
-      // لاحظ أننا نرسل الـ formData مباشرة كـ Parameter ثاني
-      // const response = await api.post('/Auth/register/provider', formData);
       const response = await api.post('/Auth/register/provider', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -112,8 +107,6 @@ export default function Register() {
       alert('Network error, please check your connection.');
     }
   };
-
-  
 
   return (
         <Card className="mx-auto" id="register" style={{ maxWidth: '600px'
