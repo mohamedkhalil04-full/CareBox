@@ -14,10 +14,13 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await api.post('/Auth/login', { email, password });
-      
+
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("isLoggedIn", "true");
       // localStorage.setItem("userRole", response.data.providerTypeId); // دي عشان نوع المستخدم
+      if (response.data.providerType) {
+        localStorage.setItem("providerType", response.data.providerType);
+      }
       alert("✅ Welcome Back!");
       navigate("/home");
     } catch (error) {
@@ -25,7 +28,10 @@ const Login = () => {
       alert(`❌ ${errorMsg}`);
     }
   };
-  
+
+
+
+
   return (
     <form onSubmit={handleSubmit} className="carebox-container p-2 mx-auto my-2 rounded  d-flex flex-column">
 
@@ -92,7 +98,7 @@ const Login = () => {
         <p className="text-center ">
           Don't have an account?{" "}
           <a className="text-decoration-none " href="/register">
-            <label className="text-danger" style={{cursor:'pointer'}}>Register Now</label>
+            <label className="text-danger" style={{ cursor: 'pointer' }}>Register Now</label>
           </a>
         </p>
       </div>

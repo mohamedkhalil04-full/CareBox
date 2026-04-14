@@ -1,6 +1,6 @@
 import "./App.css";
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ProviderProvider } from './context/ProviderContext';
 
 // auth
 import AuthLayout from "./layouts/AuthLayout";
@@ -12,50 +12,53 @@ import CreateNewPass from "./pages/Authentication-pages/CreateNewPass/CreateNewP
 
 // main
 import MainLayout from "./layouts/MainLayout";
-import Home from "./pages/home/Home";
-import Bookings from './pages/bookings/bookings'
-import Clients from './pages/clients/clients'
-import Services from './pages/services/services'
-import Reviews from './pages/reviews/reviews'
-import Profile from './pages/profile/profile'
-import Settings from './pages/settings/settings'
-import About from "./pages/About/About";
-import Invoices from "./pages/invoices/invoices";
+// Shared Features     
+import Clients from "./features/shared/clients/Clients";
+import Invoices from "./features/shared/invoices/Invoices";
+import Reviews from "./features/shared/reviews/Reviews";
+import Profile from "./features/shared/profile/Profile";
+import Settings from "./features/shared/settings/Settings";
+import About from "./features/shared/about/About";
+// // Wrappers for dynamic pages
+import HomeWrapper from "./features/home/HomeWrapper";
+import BookingWrapper from "./features/bookings/BookingWrapper";
+import ServiceWrapper from "./features/services/ServiceWrapper";
 
-// not found
+// Not Found
 import NotFound from "./pages/NotFound/NotFound";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* DashBoard */}
-        <Route element={<MainLayout />}>
-          <Route path="/home" element={<Home />} />
-          <Route path="/bookings" element={<Bookings />} />
-          <Route path="/clients" element={<Clients />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/reviews" element={<Reviews />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/invoices" element={<Invoices/>}/>
-        </Route>
+    <ProviderProvider>   {/* Context هنا */}
+      <Router>
+        <Routes>
+          {/* Main LayOut "protected routes" for Dashboard */}
+          <Route element={<MainLayout />}>
+            <Route path="/home" element={<HomeWrapper />} />
+            <Route path="/bookings" element={<BookingWrapper />} />
+            <Route path="/clients" element={<Clients />} />
+            <Route path="/services" element={<ServiceWrapper />} />
+            <Route path="/invoices" element={<Invoices />} />
+            <Route path="/reviews" element={<Reviews />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
 
-        {/* authontication*/}
-        <Route element={<AuthLayout />}>
-          <Route path="/" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/otp" element={<OTP/>} />
-          <Route path="/createnewpass" element={<CreateNewPass/>}/>
-          <Route path='/forgotPass' element={<ForgotPass/>}/>
-        </Route>
+          {/* authontication routes*/}
+          <Route element={<AuthLayout />}>
+            <Route path="/" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/otp" element={<OTP />} />
+            <Route path="/createnewpass" element={<CreateNewPass />} />
+            <Route path='/forgotPass' element={<ForgotPass />} />
+          </Route>
 
-        {/* صفحة الخطأ */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Router>
+          {/*404 Not Found*/}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
+    </ProviderProvider>
   );
 }
-
 export default App;
