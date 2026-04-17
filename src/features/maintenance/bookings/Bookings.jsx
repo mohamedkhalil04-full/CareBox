@@ -264,6 +264,7 @@ const updateStatus = async (bookingId, newStatusString) => {
                 <th>Booking Date & Time</th>
                 <th>Status</th>
                 <th>Actions</th>
+                <th>Invoices</th>
               </tr>
             </thead>
             <tbody>
@@ -298,6 +299,7 @@ const updateStatus = async (bookingId, newStatusString) => {
                         </div>
                       </td>
                       <td>{getActions(booking)}</td>
+                      <td>{getInvoiceAction(booking)}</td>
                     </tr>
                   );
                 })
@@ -309,5 +311,44 @@ const updateStatus = async (bookingId, newStatusString) => {
     </div>
   );
 };
+  // دالة لعرض زر الفاتورة حسب الـ Status
+  const getInvoiceAction = (booking) => {
+    const status = booking.status?.trim();
 
+    if (status === "Approved") {
+      return (
+        <Button
+          variant="success"
+          size="sm"
+          onClick={() => handleEditInvoice(booking.bookingId)}
+        >
+          Edit Invoice
+        </Button>
+      );
+    }
+
+    if (status === "Completed") {
+      return (
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={() => handleViewInvoice(booking.bookingId)}
+        >
+          View Invoice
+        </Button>
+      );
+    }
+
+    return <span className="text-muted small">—</span>;
+  };
+
+  // دالة مؤقتة للتعديل (هنطورها بعدين)
+  const handleEditInvoice = (bookingId) => {
+    alert(`Editing Invoice for booking ID: ${bookingId}\n\n قريبا ان شاء الله`);
+    // navigate(`/invoices/edit/${bookingId}`);   // لو عايز نعمل صفحة منفصلة
+  };
+
+  const handleViewInvoice = (bookingId) => {
+    alert(`Viewing Final Invoice for booking ID: ${bookingId}`);
+  };
 export default MaintenanceBookings;

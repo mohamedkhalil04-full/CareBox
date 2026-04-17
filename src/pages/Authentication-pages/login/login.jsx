@@ -24,7 +24,7 @@ const Login = () => {
       alert("✅ Welcome Back!");
       navigate("/home");
     } catch (error) {
-      const errorMsg = error.response?.data?.message || "Invalid email or password";
+      const errorMsg = error.response?.data?.message || "Invalid email or password or may be bad network";
       alert(`❌ ${errorMsg}`);
     }
   };

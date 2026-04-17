@@ -67,14 +67,20 @@ export const getSidebarItems = (providerType) => {
         ...commonItems.slice(1),
       ];
 
-    case PROVIDER_TYPES.SPARE_PARTS:     // قطع غيار
+    case PROVIDER_TYPES.SPARE_PARTS:     // قطع غيار 
+    case "Spare Parts":
+    case "Spare parts":
+    case "spare parts":
+    case "spareparts":
+    case "Sparepart":
+      console.log("✅ Spare Parts case matched successfully!");
       return [
         ...commonItems.slice(0, 1),
-        // { path: "/orders", label:"Orders",icon:""}
-        { path: "/services", label: "Products", icon: "fa-solid fa-gears" },
+       { path: "/bookings", label: "Bookings / Orders", icon: "fa-regular fa-calendar" },
+        { path: "/services", label: "Products & Spare Parts", icon: "fa-solid fa-gears" },
         ...commonItems.slice(1),
       ];
-
+      
     default:
       return commonItems;
   }

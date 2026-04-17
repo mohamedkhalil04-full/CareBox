@@ -5,22 +5,27 @@ export const useProviderType = () => {
   const isCarCare = providerType === "Car Care";
   const isMaintenance = providerType === "Maintenance";
   const isEmergency = providerType === "Emergency";
-  const isSpareParts = providerType === "Spare parts and accessories";
+  const isSpareParts = providerType === "Spare Parts";// هتصدقني لو قولتك المشكلة كانت في حرف؟
 
-  const getColor = () => {
-    if (isCarCare) return "#dc3545";
-    if (isMaintenance) return "#343a40";
-    if (isEmergency) return "#fd7e14";
-    if (isSpareParts) return "#198754";
-    return "#6c757d";
-  };
+  // Normalize the string to avoid small differences
+  // const normalizedType = providerType ? providerType.trim() : "";
+
+  // const isCarCare = normalizedType === "Car Care";
+  // const isMaintenance = normalizedType === "Maintenance";
+  // const isEmergency = normalizedType === "Emergency";
+  // const isSpareParts = 
+  //   normalizedType === "Spare parts and accessories" ||
+  //   normalizedType === "Spare Parts" ||
+  //   normalizedType === "spare parts" ||
+  //   normalizedType.toLowerCase().includes("spare");
+  
 
   return {
+    // providerType:normalizedType,
     providerType,
     isCarCare,
     isMaintenance,
     isEmergency,
     isSpareParts,
-    color: getColor(),
   };
 };

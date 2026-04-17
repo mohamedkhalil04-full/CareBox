@@ -24,29 +24,37 @@ const Profile = () => {
   const [message, setMessage] = useState({ type: "", text: "" });
   const [hasChanges, setHasChanges] = useState(false);
 
-  // جلب البيانات عند تحميل الصفحة
+  // جلب البيانات
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const res = await api.get("/ProviderProfile");
         const data = res.data || {};
 
+        //الرابط الأساسي للسيرفر (شيلنا /api من الـ baseURL اللي في ملف axios)
+        const SERVER_URL = "http://careboxapi.runasp.net";
+
+        const rawPath = data.logoImageUrl || "";
+        const fullImageUrl = rawPath && !rawPath.startsWith("http") 
+          ? `${SERVER_URL}${rawPath}` 
+          : rawPath;
+
         const initial = {
           shopName: data.shopName || "",
           name: data.name || "",
           address: data.address || "",
-          phone: data.phoneNumber || "",
+          phone: data.phoneNumber || "", 
           email: data.email || "",
           workingHours: data.workingHours || "",
-          logoUrl: data.logoUrl || data.logo || data.image || "",
+          logoUrl: fullImageUrl,
           latitude: data.latitude?.toString() || "",
           longitude: data.longitude?.toString() || "",
         };
 
         setProfile(initial);
         setFormData(initial);
-        if (initial.logoUrl) {
-          setLogoPreview(initial.logoUrl);
+        if (fullImageUrl) {
+          setLogoPreview(fullImageUrl);
         }
       } catch (err) {
         console.error("Error fetching profile:", err);
@@ -82,7 +90,7 @@ const Profile = () => {
 
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) {
-      setMessage({ type: "warning", text: "المتصفح لا يدعم تحديد الموقع" });
+      setMessage({ type: "warning", text: "browser doesn't support confirming location" });
       return;
     }
 
@@ -96,7 +104,7 @@ const Profile = () => {
         }));
       },
       (err) => {
-        setMessage({ type: "danger", text: "فشل جلب الموقع: " + err.message });
+        setMessage({ type: "danger", text: "fetching location failed" + err.message });
       }
     );
   };
@@ -109,11 +117,10 @@ const Profile = () => {
     try {
       const payload = new FormData();
 
-      // نستخدم الأسماء اللي في Postman بالظبط
       payload.append("Name", formData.name || formData.shopName || "");
       payload.append("ShopName", formData.shopName || formData.name || "");
       payload.append("Address", formData.address || "");
-      payload.append("Phone", formData.phone || "");               // ← مهم: إضافة الـ phone
+      payload.append("Phone", formData.phone || "");            
       payload.append("WorkingHours", formData.workingHours || "");
       payload.append("Latitude", formData.latitude || "");
       payload.append("Longitude", formData.longitude || "");
@@ -135,7 +142,7 @@ const Profile = () => {
       // تحديث البيانات المحلية بعد النجاح
       const updated = { ...formData };
       if (logoFile) {
-        updated.logoUrl = URL.createObjectURL(logoFile); // preview مؤقت
+        updated.logoUrl = URL.createObjectURL(logoFile); 
       }
       setProfile(updated);
       setLogoFile(null);
@@ -164,7 +171,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="container pt-3" style={{ maxWidth: "1100px" }}>
+    <div className="container" style={{ maxWidth: "1100px" }}>
       <h4 className="mb-2 fw-bold">Workshop Profile</h4>
 
       {message.text && (
@@ -179,10 +186,10 @@ const Profile = () => {
 
       <div className="card shadow-sm border-0">
         <div className="card-body p-2">
-          <h5 className="mb-3 border-bottom pb-2">General Information</h5>
+          <h5 className="mb-1 border-bottom pb-1">General Information</h5>
 
           {/* Logo */}
-          <Form.Group className="mb-2">
+          <Form.Group className="mb-1">
             <Form.Label>Workshop Logo</Form.Label>
             <div className="d-flex align-items-center gap-4 flex-wrap">
               {logoPreview ? (
@@ -190,7 +197,7 @@ const Profile = () => {
                   src={logoPreview}
                   alt="Workshop Logo"
                   className="rounded-circle border"
-                  style={{ width: "100px", height: "100px", objectFit: "cover" }}
+                  style={{ width: "150px", height: "150px", objectFit: "cover" }}
                 />
               ) : (
                 <div
