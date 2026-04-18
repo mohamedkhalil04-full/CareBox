@@ -96,15 +96,13 @@ const SparePartsProducts = () => {
                   <span className="text-success fw-medium">Active</span>
                 </td>
                 <td className="text-center">
-                  <button className="btn btn-link text-muted p-1">
-                    <i className="bi bi-pencil"></i>
-                  </button>
-                  <button className="btn btn-link text-muted p-1">
-                    <i className="bi bi-trash"></i>
-                  </button>
                   <button className="btn btn-link text-muted">
                     <i className="fas fa-pencil"></i>
+                  </button>
+                  <button className="btn btn-link text-muted p-1">
                     <i className="m-2 fas fa-trash"></i>
+                  </button>
+                  <button className="btn btn-link text-muted p-1">
                     <i className="fas fa-ellipsis-vertical"></i>
                   </button>
                 </td>
@@ -133,15 +131,13 @@ const SparePartsProducts = () => {
                   <span className="text-success fw-medium">Active</span>
                 </td>
                 <td className="text-center">
-                  <button className="btn btn-link text-muted p-1">
-                    <i className="bi bi-pencil"></i>
-                  </button>
-                  <button className="btn btn-link text-muted p-1">
-                    <i className="bi bi-trash"></i>
-                  </button>
                   <button className="btn btn-link text-muted">
                     <i className="fas fa-pencil"></i>
+                  </button>
+                  <button className="btn btn-link text-muted p-1">
                     <i className="m-2 fas fa-trash"></i>
+                  </button>
+                  <button className="btn btn-link text-muted p-1">
                     <i className="fas fa-ellipsis-vertical"></i>
                   </button>
                 </td>
@@ -174,15 +170,13 @@ const SparePartsProducts = () => {
                   <span className="text-success fw-medium">Active</span>
                 </td>
                 <td className="text-center">
-                  <button className="btn btn-link text-muted p-1">
-                    <i className="bi bi-pencil"></i>
-                  </button>
-                  <button className="btn btn-link text-muted p-1">
-                    <i className="bi bi-trash"></i>
-                  </button>
                   <button className="btn btn-link text-muted">
                     <i className="fas fa-pencil"></i>
+                  </button>
+                  <button className="btn btn-link text-muted p-1">
                     <i className="m-2 fas fa-trash"></i>
+                  </button>
+                  <button className="btn btn-link text-muted p-1">
                     <i className="fas fa-ellipsis-vertical"></i>
                   </button>
                 </td>
@@ -217,15 +211,13 @@ const SparePartsProducts = () => {
                   <span className="badge bg-secondary p-2 ">Draft</span>
                 </td>
                 <td className="text-center">
-                  <button className="btn btn-link text-muted p-1">
-                    <i className="bi bi-pencil"></i>
-                  </button>
-                  <button className="btn btn-link text-muted p-1">
-                    <i className="bi bi-trash"></i>
-                  </button>
                   <button className="btn btn-link text-muted">
                     <i className="fas fa-pencil"></i>
+                  </button>
+                  <button className="btn btn-link text-muted p-1">
                     <i className="m-2 fas fa-trash"></i>
+                  </button>
+                  <button className="btn btn-link text-muted p-1">
                     <i className="fas fa-ellipsis-vertical"></i>
                   </button>
                 </td>
@@ -254,15 +246,13 @@ const SparePartsProducts = () => {
                   <span className="text-success fw-medium">Active</span>
                 </td>
                 <td className="text-center">
-                  <button className="btn btn-link text-muted p-1">
-                    <i className="bi bi-pencil"></i>
-                  </button>
-                  <button className="btn btn-link text-muted p-1">
-                    <i className="bi bi-trash"></i>
-                  </button>
                   <button className="btn btn-link text-muted">
                     <i className="fas fa-pencil"></i>
+                  </button>
+                  <button className="btn btn-link text-muted p-1">
                     <i className="m-2 fas fa-trash"></i>
+                  </button>
+                  <button className="btn btn-link text-muted p-1">
                     <i className="fas fa-ellipsis-vertical"></i>
                   </button>
                 </td>
@@ -293,15 +283,13 @@ const SparePartsProducts = () => {
                   <span className="text-success fw-medium">Active</span>
                 </td>
                 <td className="text-center">
-                  <button className="btn btn-link text-muted p-1">
-                    <i className="bi bi-pencil"></i>
-                  </button>
-                  <button className="btn btn-link text-muted p-1">
-                    <i className="bi bi-trash"></i>
-                  </button>
                   <button className="btn btn-link text-muted">
                     <i className="fas fa-pencil"></i>
+                  </button>
+                  <button className="btn btn-link text-muted p-1">
                     <i className="m-2 fas fa-trash"></i>
+                  </button>
+                  <button className="btn btn-link text-muted p-1">
                     <i className="fas fa-ellipsis-vertical"></i>
                   </button>
                 </td>
