@@ -151,16 +151,16 @@ const MaintenanceServices = () => {
                                             <button
                                                 onClick={() => handleEditClick(service)}
                                                 className="btn btn-sm btn-success"
-                                                disabled
+                                                // disabled
                                             >
-                                                Edit <i class="fa-solid fa-pen-to-square"></i> (comming soon)
+                                                Edit <i class="fa-solid fa-pen-to-square"></i> 
                                             </button>
                                             <button
                                                 onClick={() => alert("Delete coming soon")}
                                                 className="btn btn-sm btn-danger"
-                                                disabled
+                                                // disabled
                                             >
-                                                Delete <i class="fa-solid fa-trash"></i> (comming soon)
+                                                Delete <i class="fa-solid fa-trash"></i> 
                                             </button>
                                         </div>
                                     </div>

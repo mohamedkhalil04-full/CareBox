@@ -22,6 +22,9 @@ const MaintenanceBookings = () => {
   const [currentBookingId, setCurrentBookingId] = useState(null);
   const [invoiceItems, setInvoiceItems] = useState([]); // الخدمات في الفاتورة
   const [newItem, setNewItem] = useState({ itemDescription: "", price: "" });
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewInvoice, setViewInvoice] = useState(null);
+  const [viewLoading, setViewLoading] = useState(false);
 
   const fetchBookings = async (status = null) => {
     setLoading(true);
@@ -210,7 +213,7 @@ const MaintenanceBookings = () => {
 
   //   try {
   //     const res = await api.get(`/Invoices/GetInvoiceByBooking/${bookingId}`);
-      
+
   //     console.log("📥 Full API Response:", res.data);
 
   //     let fetchedItems = [];
@@ -249,19 +252,36 @@ const MaintenanceBookings = () => {
   //   }
   // };
 
-    const handleEditInvoice = (bookingId) => {
+  const handleEditInvoice = (bookingId) => {
     setCurrentBookingId(bookingId);
     setShowInvoiceModal(true);
     setNewItem({ itemDescription: "", price: "" });
-    
+
     // نبدأ الـ Modal فاضي تمامًا عشان نمنع التكرار
-    setInvoiceItems([]);   
+    setInvoiceItems([]);
 
     console.log(`🆕 Opening fresh Edit Invoice for booking #${bookingId} - Starting empty`);
   };
   // دالة عرض الفاتورة النهائية
-  const handleViewInvoice = (bookingId) => {
-    alert(`Viewing Final Invoice for booking ID: ${bookingId}`);
+  const handleViewInvoice = async (bookingId) => {
+    setViewLoading(true);
+    setShowViewModal(true);
+
+    try {
+      const res = await api.get(`/Invoices/GetInvoiceByBooking/${bookingId}`);
+
+      let invoiceData = res.data?.data || res.data;
+
+      console.log("View Invoice Response:", invoiceData);
+
+      setViewInvoice(invoiceData);
+    } catch (err) {
+      console.error("Failed to fetch invoice for view:", err);
+      alert("Failed to load invoice. Please try again.");
+      setViewInvoice(null);
+    } finally {
+      setViewLoading(false);
+    }
   };
 
   return (
@@ -447,8 +467,8 @@ const MaintenanceBookings = () => {
           <Button variant="secondary" onClick={() => setShowInvoiceModal(false)}>
             Cancel
           </Button>
-                    <Button 
-            variant="danger" 
+          <Button
+            variant="danger"
             onClick={async () => {
               if (invoiceItems.length === 0) {
                 alert("Please add at least one service");
@@ -478,6 +498,70 @@ const MaintenanceBookings = () => {
             }}
           >
             Save Invoice Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      
+            {/* View Invoice Modal */}
+      <Modal 
+        show={showViewModal} 
+        onHide={() => setShowViewModal(false)} 
+        size="lg"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Invoice - Booking #{currentBookingId}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {viewLoading ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status" />
+              <p className="mt-3">Loading invoice...</p>
+            </div>
+          ) : viewInvoice ? (
+            <div className="invoice-preview p-4 border rounded bg-white">
+              <div className="text-center mb-4">
+                <h4 className="fw-bold">CareBox - Invoice</h4>
+                <p className="text-muted mb-1">Booking #{currentBookingId}</p>
+                <p className="text-muted">Issue Date: {new Date(viewInvoice.issueDate || Date.now()).toLocaleDateString('en-US')}</p>
+              </div>
+
+              <div className="mb-4">
+                <strong>Client:</strong> {viewInvoice.clientName || "—"}
+              </div>
+
+              <h6 className="mb-3">Services</h6>
+              {viewInvoice.items && viewInvoice.items.length > 0 ? (
+                <div>
+                  {viewInvoice.items.map((item, index) => (
+                    <div key={index} className="d-flex justify-content-between py-2 border-bottom">
+                      <span>{item.itemDescription || item.description}</span>
+                      <span className="fw-bold">
+                        {Number(item.price || 0).toLocaleString("en-US")} EGP
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted">No services found.</p>
+              )}
+
+              <div className="mt-4 pt-3 border-top d-flex justify-content-between align-items-center fs-5">
+                <strong>Total Amount</strong>
+                <strong className="text-danger">
+                  {Number(viewInvoice.totalAmount || 
+                    viewInvoice.items?.reduce((sum, i) => sum + (Number(i.price) || 0), 0) || 0
+                  ).toLocaleString("en-US")} EGP
+                </strong>
+              </div>
+            </div>
+          ) : (
+            <p className="text-center text-muted py-5">No invoice data available</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowViewModal(false)}>
+            Close
           </Button>
         </Modal.Footer>
       </Modal>
