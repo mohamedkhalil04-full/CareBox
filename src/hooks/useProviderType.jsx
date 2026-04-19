@@ -5,11 +5,10 @@ export const useProviderType = () => {
   const isCarCare = providerType === "Car Care";
   const isMaintenance = providerType === "Maintenance";
   const isEmergency = providerType === "Emergency";
-  const isSpareParts = providerType === "Spare Parts";// هتصدقني لو قولتك المشكلة كانت في حرف؟
+  const isSpareParts = providerType === "Spare Parts";// هتصدقني لو قولتك ان المشكلة كانت في حرف
 
-  // Normalize the string to avoid small differences
+  // // Normalize the string to avoid small differences
   // const normalizedType = providerType ? providerType.trim() : "";
-
   // const isCarCare = normalizedType === "Car Care";
   // const isMaintenance = normalizedType === "Maintenance";
   // const isEmergency = normalizedType === "Emergency";
@@ -18,7 +17,6 @@ export const useProviderType = () => {
   //   normalizedType === "Spare Parts" ||
   //   normalizedType === "spare parts" ||
   //   normalizedType.toLowerCase().includes("spare");
-  
 
   return {
     // providerType:normalizedType,

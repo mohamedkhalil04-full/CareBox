@@ -3,33 +3,47 @@ import api from "../../api/axiosInstance";
 import { NavLink, useNavigate } from 'react-router-dom';
 import { UseProvider } from '../../context/ProviderContext';
 import { getSidebarItems } from '../../constants/navigation';
-import React, { useState, useEffect } from "react"; 
+import {useState, useEffect} from "react"
 
 const SideBar =()=>{
 
-const [profileData, setProfileData] = useState({ name: "", logo: "" });
-const BASE_URL = "http://careboxapi.runasp.net"; 
+  const [profile, setProfile] = useState({
+      shopName: "",
+      name: "",
+    });
+  
+    const [formData, setFormData] = useState({ ...profile });
+    const [logoPreview, setLogoPreview] = useState(null);
+  // جلب البيانات
+    useEffect(() => {
+      const fetchProfile = async () => {
+        
+          const res = await api.get("/ProviderProfile");
+          const data = res.data || {};
+  
+          //الرابط الأساسي للسيرفر (شيلنا /api من الـ baseURL اللي في ملف axios)
+          const SERVER_URL = "http://careboxapi.runasp.net";
+  
+          const rawPath = data.logoImageUrl || "";
+          const fullImageUrl = rawPath && !rawPath.startsWith("http") 
+            ? `${SERVER_URL}${rawPath}` 
+            : rawPath;
+  
+          const initial = {
+            shopName: data.shopName || "",
+            name: data.name || "",
+          };
 
-useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      const res = await api.get("/ProviderProfile/Profile");
-      const data = res.data?.data || res.data || {};
+          
+        setProfile(initial);
+        setFormData(initial);
+        if (fullImageUrl) {
+          setLogoPreview(fullImageUrl);
+        }
+    };
 
-        const rawPath = data.logoImageUrl || "";
-        const fullImageUrl = rawPath && !rawPath.startsWith("http") 
-          ? `${BASE_URL}${rawPath}` 
-          : rawPath;
-      setProfileData({
-        name: data.shopName || data.name || "AutoFix Workshop",
-        logo: fullImageUrl 
-      });
-    } catch (err) {
-      console.error("Failed to fetch sidebar profile:", err);
-    }
-  };
-  fetchProfile();
-}, []);
+    fetchProfile();
+  }, []);
 
 const navigate = useNavigate()
 const { providerType } = UseProvider();
@@ -70,19 +84,18 @@ const handleLogout = async () => {
     <aside className="bg-white d-flex flex-column p-3 vh-100" style={{borderRight:'1px gray solid'}}>
       {/* الجزء الفوقاني بتاعه */}
       <div className="d-flex flex-column align-items-center  mb-4 mt-2">
-        {profileData.logo ? (
-      <img 
-        src={profileData.logo.startsWith('http') ? profileData.logo : `${BASE_URL}${profileData.logo}`} 
-        alt="Logo" 
-        className="rounded-circle mb-2 shadow-sm"
-        style={{ width: "60px", height: "60px", objectFit: "cover", border: "2px solid #f8f9fa" }}
-        onError={(e) => { e.target.src = "https://via.placeholder.com/60"; }}
-      />
-    ) : (
-      <i className="fa-solid fa-car p-1 fs-2 mb-2"></i> // أيقونة احتياطية
-    )}
-        <small className="text-secondary py-1">Welcome Back</small>
-        <b className="mb-0 fw-bold text-center">{profileData.name || "AutoFix Workshop"}</b>
+        {logoPreview ? (
+                <img
+                  src={logoPreview}
+                  alt="Workshop Logo"
+                  className="rounded-circle border"
+                  style={{ width: "100px", height: "100px", objectFit: "cover" }}
+                />
+              ) : (
+                <i className="fa-solid fa-car p-1 fs-2 mb-2"></i>
+              )}
+        
+        <b className="mb-0 fw-bold text-center">{formData.shopName}</b>
         {providerType && (
            <small className="text-muted mt-1" style={{ fontSize: '0.85rem' }}>
              {providerType}
