@@ -35,11 +35,11 @@ export const getSidebarItems = (providerType) => {
       label: "About Us", 
       icon: "fa-solid fa-award" 
     },
-    { 
-      path: "/settings", 
-      label: "Settings", 
-      icon: "fa-solid fa-gear" 
-    },
+    // { 
+    //   path: "/settings", 
+    //   label: "Settings", 
+    //   icon: "fa-solid fa-gear" 
+    // },
     
   ];
   switch (providerType) {
@@ -61,17 +61,20 @@ export const getSidebarItems = (providerType) => {
 
     case PROVIDER_TYPES.SPARE_PARTS:     // قطع غيار 
       return [
-        ...commonItems.slice(0, 1),
-       { path: "/bookings", label: "Orders", icon: "fa-regular fa-calendar" },
-        { path: "/services", label: "Products", icon: "fa-solid fa-gears" },
+        { path: "/home", label: "Dashboard", icon: "fa-solid fa-chart-bar" },
+        { path: "/services", label: "Products", icon: "fa-solid fa-cube" },
+       { path: "/bookings", label: "Orders", icon: "fa-solid fa-cart-arrow-down" },
+       { path: "/inventory", label: "Inventory", icon: "fa-solid fa-boxes-stacked" },
         ...commonItems.slice(1),
       ];
 
     case PROVIDER_TYPES.EMERGENCY:       // طوارئ
       return [
-        ...commonItems.slice(0, 1),
-        { path: "/bookings", label: "Emergency Requests", icon: "fa-solid fa-truck-medical" },
-        { path: "/services", label: "Emergency Services", icon: "fa-solid fa-wrench" },
+        { path: "/home", label: "Dashboard", icon: "fa-solid fa-chart-bar" },
+        { path: "/EmergencyRequests", label: "Emergency Requests", icon: "fa-solid fa-truck-medical" },
+        { path: "/allRequests", label: "All Requests", icon: "fa-solid fa-truck-medical"},
+        { path: "/Notifications", label: "Notifications", icon: "fa-solid fa-truck-medical"},
+        { path: "/Reports", label: "Reports", icon: "fa-solid fa-truck-medical"},
         ...commonItems.slice(1),
       ];
 

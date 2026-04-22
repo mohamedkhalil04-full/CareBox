@@ -7,6 +7,11 @@ export const useProviderType = () => {
   const isEmergency = providerType === "Emergency";
   const isSpareParts = providerType === "Spare Parts";// هتصدقني لو قولتك ان المشكلة كانت في حرف
 
+  
+  // ألوان كل نوع
+  const getColor = () => {
+    if (isSpareParts)  return "#0f172a";   // الداكن الجديد لقطع الغيار
+  };
   // // Normalize the string to avoid small differences
   // const normalizedType = providerType ? providerType.trim() : "";
   // const isCarCare = normalizedType === "Car Care";
@@ -25,5 +30,7 @@ export const useProviderType = () => {
     isMaintenance,
     isEmergency,
     isSpareParts,
+    color: getColor(),
+    isDarkTheme: isSpareParts,
   };
 };
