@@ -1,0 +1,39 @@
+.custom-border {
+  border-left: 5px solid orange !important;
+}
+
+.receiving-btn {
+  background-color: #e6f9f0;
+  color: #198754;
+  border: 1px solid #b6f0d1;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.receiving-btn .dot {
+  width: 8px;
+  height: 8px;
+  background-color: #20c997;
+  border-radius: 50%;
+}
+
+.custom-border {
+  border-left: 5px solid orange !important; /* الخط البرتقالي اللي في الجنب */
+  border-radius: 15px;
+}
+
+.receiving-btn {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.dot {
+  height: 10px;
+  width: 10px;
+  background-color: #2e7d32;
+  border-radius: 50%;
+  display: inline-block;
+}

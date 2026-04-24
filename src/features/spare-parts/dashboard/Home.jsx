@@ -22,6 +22,8 @@ ChartJS.register(
   Filler,
 );
 
+import "../inventory/inventory.css";
+
 const SparePartsHome = () => {
   // Revenue Chart Data & Options
   const revenueData = {
@@ -81,7 +83,7 @@ const SparePartsHome = () => {
         ticks: {
           color: "#64748b",
           font: { size: 12 },
-          callback: (value) => "$" + value,
+          callback: (value) => value + " " + "EGP",
         },
       },
     },
@@ -97,7 +99,7 @@ const SparePartsHome = () => {
       {/* Top Stats Cards - Same as before */}
       <div className="row g-4 mb-5">
         <div className="col-12 col-md-6 col-xl-3">
-          <div className="card h-100 border-0 shadow-sm">
+          <div className="card h-100 border-0 shadow-sm hover-card">
             <div className="card-body">
               <div className="d-flex justify-content-between align-items-start">
                 <div>
@@ -119,7 +121,7 @@ const SparePartsHome = () => {
         </div>
 
         <div className="col-12 col-md-6 col-xl-3">
-          <div className="card h-100 border-0 shadow-sm">
+          <div className="card h-100 border-0 shadow-sm hover-card">
             <div className="card-body">
               <div className="d-flex justify-content-between align-items-start">
                 <div>
@@ -141,7 +143,7 @@ const SparePartsHome = () => {
         </div>
 
         <div className="col-12 col-md-6 col-xl-3">
-          <div className="card h-100 border-0 shadow-sm">
+          <div className="card h-100 border-0 shadow-sm hover-card">
             <div className="card-body">
               <div className="d-flex justify-content-between align-items-start">
                 <div>
@@ -163,7 +165,7 @@ const SparePartsHome = () => {
         </div>
 
         <div className="col-12 col-md-6 col-xl-3">
-          <div className="card h-100 border-0 shadow-sm">
+          <div className="card h-100 border-0 shadow-sm hover-card">
             <div className="card-body">
               <div className="d-flex justify-content-between align-items-start">
                 <div>

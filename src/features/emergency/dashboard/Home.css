@@ -1,0 +1,33 @@
+.table {
+  border-collapse: separate;
+  border-spacing: 0 12px;
+}
+
+.table td,
+.table th {
+  padding: 16px;
+}
+
+.table tbody tr {
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.table tbody tr:hover {
+  transform: scale(1);
+  transition: 0.2s;
+}
+
+.flat-tire {
+  background-color: #ffedd5;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+.hover-card {
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.hover-card:hover {
+  transform: translateY(-20px) !important;
+  box-shadow: 0px 30px 60px rgba(0, 0, 0, 0.45);
+}
