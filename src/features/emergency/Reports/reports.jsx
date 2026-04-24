@@ -24,11 +24,11 @@ ChartJS.register(
 
 const Reports = () => {
   const revenueData = {
-    labels: ["1", "5", "10", "15", "20", "25", "30"],
+    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     datasets: [
       {
         label: "Revenue",
-        data: [1200, 1800, 1600, 2400, 2100, 2800, 3200],
+        data: [300, 600, 470, 550, 700, 760, 800],
         borderColor: "#3b82f6",
         backgroundColor: (context) => {
           const chart = context.chart;
@@ -75,7 +75,7 @@ const Reports = () => {
       },
       y: {
         min: 0,
-        max: 3500,
+        max: 1000,
         grid: { color: "#e2e8f0" },
         ticks: {
           color: "#64748b",
