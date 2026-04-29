@@ -12,7 +12,7 @@ import {
   Legend,
 } from "chart.js";
 import api from "../../../api/axiosInstance";
-
+import LoadingStyle from "../../../utils/loadingStyle";
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 import { UseProvider } from "../../../context/ProviderContext";
 const MaintenanceHome = () => {
@@ -142,7 +142,7 @@ const MaintenanceHome = () => {
           
           {loadingEarnings ? (
             <div className="text-center py-5">
-              <div className="spinner-border text-danger" role="status" />
+              <LoadingStyle/>
               <p className="mt-3">Loading revenue data...</p>
             </div>
           ) : monthlyEarnings.length > 0 ? (

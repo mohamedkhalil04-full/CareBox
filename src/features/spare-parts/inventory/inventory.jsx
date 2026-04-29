@@ -1,199 +1,187 @@
-import React from "react";
-import "./inventory.css";
 
+import React, { useState, useEffect } from "react";
+import api from "../../../api/axiosInstance";
+import LoadingStyle from "../../../utils/loadingStyle";
 const Inventory = () => {
+  const [products, setProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchInventoryData = async () => {
+    setIsLoading(true);
+    try {
+      const res = await api.get("/Products/Provider/Inventory");
+
+      let data = res.data?.data || res.data || [];
+      if (!Array.isArray(data)) data = [];
+
+      setProducts(data);
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+      setProducts([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchInventoryData();
+  }, []);
+
+  // حساب الإحصائيات محلياً (الحل الأفضل)
+  const stats = React.useMemo(() => {
+    const inStock = products.filter(p => {
+      const stock = parseInt(p.currentStock ?? p.CurrentStock ?? 0);
+      return stock > 20;
+    }).length;
+
+    const lowStock = products.filter(p => {
+      const stock = parseInt(p.currentStock ?? p.CurrentStock ?? 0);
+      return stock > 0 && stock <= 20;
+    }).length;
+
+    const outOfStock = products.filter(p => {
+      const stock = parseInt(p.currentStock ?? p.CurrentStock ?? 0);
+      return stock === 0;
+    }).length;
+
+    return { inStock, lowStock, outOfStock };
+  }, [products]);
+
+  // تحديث الكمية
+  const handleUpdateStock = async (productId, currentStock) => {
+    const newCountStr = prompt("Enter new stock count:", currentStock);
+
+    if (newCountStr === null || newCountStr.trim() === "" || isNaN(newCountStr)) return;
+
+    const newCount = parseInt(newCountStr);
+
+    try {
+      await api.patch(`/Products/Provider/UpdateProductCountStock/${productId}`, {
+        count: newCount,
+      });
+
+      alert("Stock updated successfully");
+      fetchInventoryData(); // تحديث كل البيانات
+    } catch (error) {
+      console.error("Update error:", error);
+      alert("Failed to update stock");
+    }
+  };
+
+  const filteredProducts = products.filter((product) =>
+    (product.name?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+    (product.productId?.toString() || "").includes(searchQuery)
+  );
+
+  const getStockColorClass = (stock) => {
+    const s = parseInt(stock) || 0;
+    if (s === 0) return "text-danger";
+    if (s <= 20) return "text-warning";
+    return "text-success";
+  };
+
   return (
     <div className="container py-4">
-      {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4 className="fw-bold">Inventory</h4>
-        <button className="btn btn-outline-secondary btn-sm">
-          Export Report
-        </button>
       </div>
 
       {/* Alert */}
-      <div className="alert alert-warning d-flex justify-content-between align-items-center">
-        <div>
-          <i className="fa-solid fa-triangle-exclamation mx-2 "></i>
-          <strong className="fs-5 fw-bolder">Inventory Alert:</strong> 1 out of
-          stock, 3 running low.
+      {(stats.outOfStock > 0 || stats.lowStock > 0) && (
+        <div className="alert alert-warning d-flex justify-content-between align-items-center">
+          <div>
+            <i className="fa-solid fa-triangle-exclamation mx-2"></i>
+            <strong className="fs-5 fw-bolder">Inventory Alert: </strong>
+            {stats.outOfStock} out of stock, {stats.lowStock} running low.
+          </div>
         </div>
-        <span style={{ cursor: "pointer" }}>
-          <i className="fa-solid fa-x"></i>
-        </span>
-      </div>
+      )}
 
-      {/* Cards */}
+      {/* Stats Cards */}
       <div className="row g-3 mb-4">
-        <div className="col-md-3">
-          <div className="card p-3 shadow-sm hover-card">
-            <div className="d-flex">
-              <i className="fas fa-box-open fs-3 m-3"></i>
-              <div>
-                <h4>Total SKUs</h4>
-                <h5 className="fw-bold">6</h5>
-              </div>
-            </div>
+        <div className="col-md-4">
+          <div className="card p-3 shadow-sm text-center">
+            <h4 className="text-success">In Stock</h4>
+            <h5 className="fw-bold text-success">{isLoading ? "..." : stats.inStock}</h5>
           </div>
         </div>
-
-        <div className="col-md-3">
-          <div className="card p-3 shadow-sm hover-card">
-            <div className="d-flex">
-              <i className="fa-regular fa-circle-check text-success m-1 pt-1"></i>
-              <div>
-                <h4>In Stock</h4>
-                <h5 className="fw-bold text-success">2</h5>
-              </div>
-            </div>
+        <div className="col-md-4">
+          <div className="card p-3 shadow-sm text-center">
+            <h4 className="text-warning">Low Stock</h4>
+            <h5 className="fw-bold text-warning">{isLoading ? "..." : stats.lowStock}</h5>
           </div>
         </div>
-
-        <div className="col-md-3">
-          <div className="card p-3 shadow-sm hover-card">
-            <div className="d-flex">
-              <i className="fa-solid fa-triangle-exclamation text-warning m-1 fs-4 "></i>
-              <div>
-                <h4>LOW STOCK</h4>
-                <h5 className="fw-bold text-warning">3</h5>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-md-3">
-          <div className="card p-3 shadow-sm hover-card">
-            <div className="d-flex">
-              <i className="fa-regular fa-circle-xmark text-danger m-1 pt-1 fs-5"></i>
-              <div>
-                <h4>Out Of Stock</h4>
-                <h5 className="fw-bold text-danger">1</h5>
-              </div>
-            </div>
+        <div className="col-md-4">
+          <div className="card p-3 shadow-sm text-center">
+            <h4 className="text-danger">Out of Stock</h4>
+            <h5 className="fw-bold text-danger">{isLoading ? "..." : stats.outOfStock}</h5>
           </div>
         </div>
       </div>
 
+      {/* Search */}
       <div className="mb-3">
         <input
           type="text"
           className="form-control"
-          placeholder="Search by name or SKU..."
+          placeholder="Search by name or ID..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
 
       {/* Table */}
       <div className="card shadow-sm">
         <div className="table-responsive">
-          <table className="table table-lg align-middle mb-0 g-5">
+          <table className="table table-hover align-middle mb-0">
             <thead className="table-light">
-              <tr className="py-3">
-                <th></th>
-                <th>Product</th>
+              <tr>
+                <th className="ps-4">Product</th>
                 <th>Category</th>
                 <th>Current Stock</th>
-                <th>Reorder Level</th>
                 <th>Status</th>
                 <th>Last Updated</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>
-                  <input type="checkbox" />
-                </td>
-                <td>
-                  <strong>Premium Ceramic Brake Pads</strong>
-                  <br />
-                  <small className="text-muted">BP-CER-001</small>
-                </td>
-                <td>Brakes</td>
-                <td>124</td>
-                <td>20</td>
-                <td className="text-success">In Stock</td>
-                <td>Today, 10:00 AM</td>
-              </tr>
+              {isLoading ? (
+                <div>
+                  <LoadingStyle />
+                  <tr><td colSpan="5" className="text-center py-4">Loading inventory...</td></tr>
+                </div>
+              ) : filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => {
+                  const stock = parseInt(product.currentStock ?? product.CurrentStock ?? 0);
+                  const status = product.status ?? product.Status ?? "Unknown";
 
-              <tr>
-                <td>
-                  <input type="checkbox" />
-                </td>
-                <td>
-                  <strong>Synthetic Motor Oil 5W-30</strong>
-                  <br />
-                  <small className="text-muted">OIL-SYN-5W30</small>
-                </td>
-                <td>Fluids</td>
-                <td className="text-warning">45</td>
-                <td>50</td>
-                <td className="text-warning">Low Stock</td>
-                <td>Yesterday</td>
-              </tr>
-
-              <tr>
-                <td>
-                  <input type="checkbox" />
-                </td>
-                <td>
-                  <strong>OEM Alternator Assembly</strong>
-                  <br />
-                  <small className="text-muted">ALT-OEM-150A</small>
-                </td>
-                <td>Electrical</td>
-                <td className="text-warning">3</td>
-                <td>5</td>
-                <td className="text-warning">Low Stock</td>
-                <td>Oct 24, 2025</td>
-              </tr>
-
-              <tr>
-                <td>
-                  <input type="checkbox" />
-                </td>
-                <td>
-                  <strong>High Performance Spark Plugs</strong>
-                  <br />
-                  <small className="text-muted">SP-HP-X4</small>
-                </td>
-                <td>Ignition</td>
-                <td className="text-danger">0</td>
-                <td>10</td>
-                <td className="text-danger">Out of Stock</td>
-                <td>Oct 23, 2025</td>
-              </tr>
-
-              <tr>
-                <td>
-                  <input type="checkbox" />
-                </td>
-                <td>
-                  <strong>Cabin Air Filter</strong>
-                  <br />
-                  <small className="text-muted">FIL-CAB-001</small>
-                </td>
-                <td>Filters</td>
-                <td>210</td>
-                <td>30</td>
-                <td className="text-success">In Stock</td>
-                <td>Oct 20, 2025</td>
-              </tr>
-
-              <tr>
-                <td>
-                  <input type="checkbox" />
-                </td>
-                <td>
-                  <strong>Front Bumper Cover (Unpainted)</strong>
-                  <br />
-                  <small className="text-muted">BUM-FR-UNP</small>
-                </td>
-                <td>Body</td>
-                <td className="text-warning">2</td>
-                <td>2</td>
-                <td className="text-warning">Low Stock</td>
-                <td>Oct 18, 2025</td>
-              </tr>
+                  return (
+                    <tr key={product.productId}>
+                      <td className="ps-4">
+                        <strong>{product.name}</strong><br />
+                        <small className="text-muted">ID: {product.productId}</small>
+                      </td>
+                      <td>{product.categoryName || product.CategoryName || "—"}</td>
+                      <td>
+                        <span className={`fw-bold ${getStockColorClass(stock)}`}>
+                          {stock}
+                        </span>
+                        <i
+                          className="fa-solid fa-pen-to-square ms-2 text-muted"
+                          style={{ cursor: "pointer", fontSize: "0.9rem" }}
+                          onClick={() => handleUpdateStock(product.productId, stock)}
+                        ></i>
+                      </td>
+                      <td className={`fw-bold ${getStockColorClass(stock)}`}>
+                        {status}
+                      </td>
+                      <td>{product.lastUpdate || "—"}</td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr><td colSpan="5" className="text-center py-4">No results found</td></tr>
+              )}
             </tbody>
           </table>
         </div>

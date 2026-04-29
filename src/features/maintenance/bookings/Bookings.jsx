@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../../../api/axiosInstance";
 import { Badge, Button, Form, InputGroup, Dropdown, Modal, Button as BootstrapButton } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { } from "react-bootstrap";
+import LoadingStyle from "../../../utils/loadingStyle";
 // Map للـ status
 const STATUS_MAP = {
   Pending: { label: "Pending", variant: "warning" },
@@ -318,7 +318,7 @@ const MaintenanceBookings = () => {
 
       {loading ? (
         <div className="text-center py-5">
-          <div className="spinner-border text-primary" role="status" />
+          <LoadingStyle/>
           <p className="mt-2">Loading bookings...</p>
         </div>
       ) : (

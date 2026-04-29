@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../../../api/axiosInstance";
 import { timeAgo } from "../../../utils/timeAgo";
 import "./reviews.css";
-
+import LoadingStyle from "../../../utils/loadingStyle";
 const Stars = ({ rating }) => {
   return (
     <div className="text-warning fs-5">
@@ -57,7 +57,7 @@ const Reviews = () => {
 
       {loading ? (
         <div className="text-center py-5">
-          <div className="spinner-border text-danger" role="status" />
+          <LoadingStyle/>
           <p className="mt-3">loading reviews...</p>
         </div>
       ) : reviews.length === 0 ? (

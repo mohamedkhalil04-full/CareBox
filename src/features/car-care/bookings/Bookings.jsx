@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../../../api/axiosInstance";
 import { Badge, Button, Form, InputGroup, Dropdown } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import LoadingStyle from "../../../utils/loadingStyle"
 // Map للـ status (بناءً على الداتا الحقيقية: string مش رقم)
 const STATUS_MAP = {
   Pending: { label: "Pending", variant: "warning" },
@@ -222,7 +222,8 @@ const updateStatus = async (bookingId, newStatusString) => {
 
       {loading ? (
         <div className="text-center py-5">
-          <div className="spinner-border text-primary" role="status" />
+          {/* <div className="spinner-border text-primary" role="status" /> */}
+          <LoadingStyle/>
           <p className="mt-2">loading bookings...</p>
         </div>
       ) : (

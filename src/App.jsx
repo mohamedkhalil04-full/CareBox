@@ -31,7 +31,8 @@ import Inventory from './features/spare-parts/inventory/inventory'
 import Reports from "./features/emergency/Reports/reports"
 import AllRequests from "./features/emergency/All Requests/allRequests"
 import EmergencyRequests from "./features/emergency/Emergency Requests/emergencyRequests";
-import Notifications from "./features/emergency/Notifications/notifications";
+// import Notifications from "./features/emergency/Notifications/notifications";
+import MyTech from "./features/emergency/myTech/myTech"
 // Not Found
 import NotFound from "./pages/NotFound/NotFound";
 
@@ -58,7 +59,8 @@ function App() {
             {/* only emergency */}
             <Route path="/allRequests" element={<AllRequests/>}/>
             <Route path="/EmergencyRequests" element={<EmergencyRequests/>}/>
-            <Route path="/Notifications" element={<Notifications/>}/>
+            {/* <Route path="/Notifications" element={<Notifications/>}/> */}
+            <Route path="/MyTech" element={<MyTech/>}/>
             <Route path="/Reports" element={<Reports/>}/>
           </Route>
 

@@ -1,0 +1,9 @@
+.loading-style{
+    width: 100px;
+    animation: loading 1s infinite;
+}
+
+@keyframes loading {
+    from{ transform: rotateY(0deg);}
+    to{ transform: rotateY(360deg);}
+}

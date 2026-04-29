@@ -11,14 +11,14 @@ export const getSidebarItems = (providerType) => {
       icon: "fa-regular fa-house" 
     },
     { 
-      path: "/invoices", 
-      label: "Invoices", 
-      icon: "fa-solid fa-file-invoice" 
-    },
-    { 
       path: "/clients", 
       label: "Clients", 
       icon: "fa-solid fa-users" 
+    },
+    { 
+      path: "/invoices", 
+      label: "Invoices", 
+      icon: "fa-solid fa-file-invoice" 
     },
     { 
       path: "/reviews", 
@@ -71,11 +71,12 @@ export const getSidebarItems = (providerType) => {
     case PROVIDER_TYPES.EMERGENCY:       // طوارئ
       return [
         { path: "/home", label: "Dashboard", icon: "fa-solid fa-chart-bar" },
-        { path: "/EmergencyRequests", label: "Emergency Requests", icon: "fa-solid fa-truck-medical" },
-        { path: "/allRequests", label: "All Requests", icon: "fa-solid fa-truck-medical"},
-        { path: "/Notifications", label: "Notifications", icon: "fa-solid fa-truck-medical"},
-        { path: "/Reports", label: "Reports", icon: "fa-solid fa-truck-medical"},
-        ...commonItems.slice(1),
+        { path: "/EmergencyRequests", label: "Emergency Requests", icon: "fa-solid fa-triangle-exclamation" },
+        { path: "/allRequests", label: "All Requests", icon: "fa-solid fa-clipboard-list"},
+        // { path: "/Notifications", label: "Notifications", icon: "fa-solid fa-truck-medical"},
+        { path: "/MyTech", label: "MyTech", icon: "fa-solid fa-address-book"},
+        { path: "/Reports", label: "Reports", icon: "fa-solid fa-chart-line"},
+        ...commonItems.slice(1).splice(1),
       ];
 
     default:

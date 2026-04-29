@@ -1,46 +1,64 @@
+// import { useProviderType } from '../../hooks/useProviderType'
+
+// const Head = () => {
+//   const { providerType } = useProviderType();
+
+//   // // ألوان مختلفة حسب نوع الـ Provider
+//   // const getHeaderStyle = () => {
+//   //   switch (providerType) {
+//   //     case "Maintenance":
+//   //       return { backgroundColor: "#343a40", }; // رمادي غامق
+//   //     case "Car Care":
+//   //       return { backgroundColor: "#fff", }; // أحمر (اللون الأصلي)
+//   //     case "Emergency":
+//   //       return { backgroundColor: "#fd7e14", }; // برتقالي
+//   //     case "Spare parts":
+//   //       return { backgroundColor: "#198754", }; // أخضر
+//   //     default:
+//   //       return { backgroundColor: "#dc3545", };
+//   //   }
+//    };
+
+
+
 import React from "react";
 import "./header.css";
-import { useProviderType } from '../../hooks/useProviderType'
-
+import logo from "../../../public/assets/images/proj-logo.png"
+// import { useProviderType } from '../../hooks/useProviderType'
+import { useEffect, useState } from "react";
+import api from "../../api/axiosInstance";
 const Head = () => {
-  const { providerType } = useProviderType();
+  // const { providerType } = useProviderType();
 
-   // أيقونة الجرس حسب النوع
-  const renderBellIcon = () => {
-    switch (providerType) {
-      case "Car Care":
-        return <i style={{ fontSize:"30px" }}>🚿</i>;
+  const [profile, setProfile] = useState({
+    shopName: "",
+    name: "",
+  });
 
-      case "Emergency":
-        return <i style={{ fontSize:"30px" }}>⚠️</i>;
+  const [formData, setFormData] = useState({ ...profile });
 
-      case "Spare parts":
-      case "Spare parts and accessories":
-        return <i className="bi bi-lightbulb-fill fs-4" style={{ color: "#fff" }}></i>; // حط فانوس هنا
+  
+    // جلب البيانات
+    useEffect(() => {
+      const fetchName = async () => {
+        try {
+          const res = await api.get("/ProviderProfile");
+          const data = res.data || {};
 
-      case "Maintenance":
-        return <i style={{ fontSize:"30px" }}>🛠️</i>;
-      // default:
-      //   return <i></i>
-         
-    }
-  // };
-  // // ألوان مختلفة حسب نوع الـ Provider
-  // const getHeaderStyle = () => {
-  //   switch (providerType) {
-  //     case "Maintenance":
-  //       return { backgroundColor: "#343a40", }; // رمادي غامق
-  //     case "Car Care":
-  //       return { backgroundColor: "#fff", }; // أحمر (اللون الأصلي)
-  //     case "Emergency":
-  //       return { backgroundColor: "#fd7e14", }; // برتقالي
-  //     case "Spare parts":
-  //       return { backgroundColor: "#198754", }; // أخضر
-  //     default:
-  //       return { backgroundColor: "#dc3545", };
-  //   }
-   };
-
+          const initial = {
+            shopName: data.shopName || "",
+            name: data.name || "",
+          };
+  
+          setProfile(initial);
+          setFormData(initial);
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        }
+      };
+  
+      fetchName();
+    }, []);
   return (
     <header
       className="d-flex align-items-center justify-content-between px-4"
@@ -50,20 +68,18 @@ const Head = () => {
         // ...getHeaderStyle(),
       }}
     >
-      <input
-        type="search"
-        className="search rounded m-3"
-        placeholder="search bookings, clients, or services..."
-      />
+      
+        <h2 className="mb-0 fw-bold">
+          {formData.shopName}
+        </h2>
 
-      <div className="me-3">
-        {renderBellIcon()}
+      <div className="me-3 p-2">
+        <img src={logo} alt="logo" width={90} height={60}/>
       </div>
+
+      
     </header>
   );
 };
 
 export default Head;
-
-
-

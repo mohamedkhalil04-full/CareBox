@@ -141,12 +141,6 @@ import { useState, useEffect } from "react";
 
 const SideBar = () => {
 
-  const [profile, setProfile] = useState({
-    shopName: "",
-    name: "",
-  });
-
-  const [formData, setFormData] = useState({ ...profile });
   const [logoPreview, setLogoPreview] = useState(null);
 
   // جلب البيانات
@@ -163,13 +157,6 @@ const SideBar = () => {
           ? `${SERVER_URL}${rawPath}` 
           : rawPath;
 
-        const initial = {
-          shopName: data.shopName || "",
-          name: data.name || "",
-        };
-
-        setProfile(initial);
-        setFormData(initial);
         if (fullImageUrl) {
           setLogoPreview(fullImageUrl);
         }
@@ -240,9 +227,6 @@ const SideBar = () => {
           <i className="fa-solid fa-car p-1 fs-2 mb-2"></i>
         )}
 
-        <b className="mb-0 fw-bold text-center" style={{ color: textColor }}>
-          {formData.shopName}
-        </b>
         {providerType && (
           <small className="mt-1" style={{ fontSize: '0.8rem' , color: textColor }}>
             {providerType}

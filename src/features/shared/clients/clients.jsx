@@ -3,7 +3,7 @@ import api from "../../../api/axiosInstance";
 import "./clients.css";
 import { Button, Form, InputGroup, Spinner } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import LoadingStyle from "../../../utils/loadingStyle";
 const Clients = () => {
   const [clients, setClients] = useState([]);
   const [filteredClients, setFilteredClients] = useState([]);
@@ -89,7 +89,7 @@ const Clients = () => {
 
       {loading ? (
         <div className="text-center py-5">
-          <Spinner animation="border" variant="primary" />
+          <LoadingStyle/>
           <p className="mt-3 text-muted">loading clients data...</p>
         </div>
       ) : (

@@ -1,7 +1,7 @@
 // invoices
 import React, { useState, useEffect } from "react";
 import api from "../../../api/axiosInstance";
-
+import LoadingStyle from "../../../utils/loadingStyle";
 const Invoices = () => {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ const Invoices = () => {
       setInvoices(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
-      setError("حدث خطأ أثناء تحميل الفواتير");
+      setError("error while loading invoices");
       setInvoices([]);
     } finally {
       setLoading(false);
@@ -70,7 +70,7 @@ const Invoices = () => {
 
       {loading ? (
         <div className="text-center py-5">
-          <div className="spinner-border text-danger" role="status" />
+          <LoadingStyle/>
           <p className="mt-3">Loading invoices...</p>
         </div>
       ) : (

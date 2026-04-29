@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../../../api/axiosInstance";
 import "./About.css";
 import { Button, Form, Spinner, Alert } from "react-bootstrap";
-
+import LoadingStyle from "../../../utils/loadingStyle";
 const BASE_URL = "http://careboxapi.runasp.net";
 
 const About = () => {
@@ -161,7 +161,12 @@ const About = () => {
   imagesToDelete.length > 0;
 
   if (loading) {
-    return <div className="text-center py-5"><Spinner animation="border" variant="danger" /></div>;
+   return (
+      <div className="d-flex flex-column justify-content-center align-items-center vh-100">
+        <LoadingStyle/>
+        <span className="ms-3">loading data of workshop...</span>
+      </div>
+    );
   }
 
   return (

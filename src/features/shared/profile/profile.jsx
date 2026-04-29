@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../../../api/axiosInstance";
 import { Button, Form, Spinner, Alert } from "react-bootstrap";
 import "./profile.css";
-
+import LoadingStyle from "../../../utils/loadingStyle";
 const Profile = () => {
   const [profile, setProfile] = useState({
     shopName: "",
@@ -163,8 +163,8 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center vh-100">
-        <Spinner animation="border" variant="danger" />
+      <div className="d-flex flex-column justify-content-center align-items-center vh-100">
+        <LoadingStyle/>
         <span className="ms-3">loading data of workshop...</span>
       </div>
     );
@@ -306,7 +306,7 @@ const Profile = () => {
               >
                 {saving ? (
                   <>
-                    <Spinner animation="border" size="sm" className="me-2" />
+                    <LoadingStyle/>
                     saving...
                   </>
                 ) : (
