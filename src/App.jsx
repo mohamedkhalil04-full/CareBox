@@ -13,11 +13,11 @@ import CreateNewPass from "./pages/Authentication-pages/CreateNewPass/CreateNewP
 // main
 import MainLayout from "./layouts/MainLayout";
 // Shared Features     
-import Clients from "./features/shared/clients/Clients";
-import Invoices from "./features/shared/invoices/Invoices";
-import Reviews from "./features/shared/reviews/Reviews";
-import Profile from "./features/shared/profile/Profile";
-// import Settings from "./features/shared/settings/Settings";
+import Clients from "./features/shared/clients/clients";
+import Invoices from "./features/shared/invoices/invoices";
+import Reviews from "./features/shared/reviews/reviews";
+import Profile from "./features/shared/profile/profile";
+// import Settings from "./features/shared/settings/settings";
 import About from "./features/shared/about/About";
 // // Wrappers for dynamic pages
 import HomeWrapper from "./features/home/HomeWrapper";
