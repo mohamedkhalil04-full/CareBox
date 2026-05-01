@@ -1,6 +1,6 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ProviderProvider } from './context/ProviderContext';
+import { ProviderProvider } from './context/providerContext';
 
 // auth
 import AuthLayout from "./layouts/AuthLayout";
