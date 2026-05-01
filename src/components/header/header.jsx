@@ -23,7 +23,7 @@
 
 import React from "react";
 import "./header.css";
-import logo from "../../../public/assets/images/proj-logo.png"
+import logo from "../../../src/assets/images/proj-logo.png"
 // import { useProviderType } from '../../hooks/useProviderType'
 import { useEffect, useState } from "react";
 import api from "../../api/axiosInstance";
