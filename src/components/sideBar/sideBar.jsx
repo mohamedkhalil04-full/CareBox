@@ -135,7 +135,7 @@
 import "./sideBar.css";
 import api from "../../api/axiosInstance";
 import { NavLink, useNavigate } from 'react-router-dom';
-import { UseProvider } from '../../context/ProviderContext';
+import { UseProvider } from '../../context/providerContext';
 import { getSidebarItems } from '../../constants/navigation';
 import { useState, useEffect } from "react";
 
