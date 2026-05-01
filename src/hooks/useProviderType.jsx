@@ -1,4 +1,4 @@
-import { UseProvider } from '../context/ProviderContext';
+import { UseProvider } from '../context/providerContext.jsx';
 
 export const useProviderType = () => {
   const { providerType } = UseProvider();
