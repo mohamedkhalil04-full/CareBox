@@ -14,7 +14,7 @@ import {
 import api from "../../../api/axiosInstance";
 import LoadingStyle from "../../../utils/loadingStyle";
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-import { UseProvider } from "../../../context/ProviderContext";
+import { UseProvider } from "../../../context/providerContext";
 const MaintenanceHome = () => {
   const navigate = useNavigate();
 

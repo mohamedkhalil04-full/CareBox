@@ -14,7 +14,7 @@ import LoadingStyle from "../../../utils/loadingStyle"
 import api from "../../../api/axiosInstance";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-import { UseProvider } from "../../../context/ProviderContext";
+import { UseProvider } from "../../../context/providerContext";
 const CarCareHome = () => {
   const navigate = useNavigate();
 
