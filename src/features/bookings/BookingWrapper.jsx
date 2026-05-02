@@ -3,7 +3,7 @@ import { useProviderType } from '../../hooks/useProviderType';
 
 import CarCareBookings from '../car-care/bookings/Bookings';
 import MaintenanceBookings from '../maintenance/bookings/Bookings';
-import SparePartsBookings from '../spare-parts/bookings/Bookings';
+import SparePartsBookings from '../spare-parts/orders/orders';
 
 const BookingWrapper = () => {
   const { isCarCare, isMaintenance, isSpareParts } = useProviderType();
