@@ -65,7 +65,7 @@ export const getSidebarItems = (providerType) => {
         { path: "/services", label: "Products", icon: "fa-solid fa-cube" },
        { path: "/bookings", label: "Orders", icon: "fa-solid fa-cart-arrow-down" },
        { path: "/inventory", label: "Inventory", icon: "fa-solid fa-boxes-stacked" },
-        ...commonItems.slice(1),
+        ...commonItems.slice(1).splice(1),
       ];
 
     case PROVIDER_TYPES.EMERGENCY:       // طوارئ

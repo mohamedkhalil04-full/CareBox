@@ -25,14 +25,16 @@ const SparePartsProducts = () => {
     make: "",
     forModel: "",
     year: "",
-    condition: "1",
-    horizontalPosition: "1",
-    verticalPosition: "1",
+    condition: "",
+    horizontalPosition: "",
+    verticalPosition: "",
     categoryName: "",
   });
 
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+
+  const [editingProductId, setEditingProductId] = useState(null);
 
   // Fetch All Products
   const fetchProducts = async () => {
@@ -69,6 +71,61 @@ const SparePartsProducts = () => {
     fetchProducts();
   }, []);
 
+  const handleDelete = async (productId) => {
+    if (!window.confirm("Are you sure you want to delete this product?")) return;
+
+    try {
+      await api.delete(`/Products/Delete-product/${productId}`);
+      alert("✅ Product deleted successfully!");
+      fetchProducts(); // تحديث الجدول بعد الحذف
+    } catch (err) {
+      console.error(err);
+      alert("❌ Failed to delete product: " + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleEditClick = (product) => {
+    setEditingProductId(product.productId);
+
+    // تظهير الفئة إذا كانت موجودة أو جديدة
+    const isExistingCat = categories.some(c => (c.name || c) === product.categoryName);
+    setCategoryType(isExistingCat ? "existing" : "new");
+
+    // معالجة حالة المنتج (عشان لو جيالك كلمات نحولها لأرقام للراديو باتونز)
+    let condValue = String(product.condition || "").toLowerCase().trim();
+    if (condValue === "new") condValue = "1";
+    else if (condValue === "used") condValue = "2";
+    else if (condValue === "refurbished") condValue = "3";
+
+    setFormData({
+      name: product.name || "",
+      description: product.description || "",
+      price: product.price || "",
+      stockQuantity: product.stockQuantity || "",
+      make: product.make || "",
+      forModel: product.forModel || "",
+      year: product.year || "",
+      condition: condValue,
+      horizontalPosition: String(product.horizontalPosition || ""),
+      verticalPosition: String(product.verticalPosition || ""),
+      categoryName: product.categoryName || "",
+    });
+
+    // معالجة عرض الصورة القديمة في الـ Preview
+    const SERVER_URL = "http://careboxapi.runasp.net";
+    const rawPath = (product.images && product.images.length > 0)
+      ? product.images[0].imageUrl
+      : (product.imageUrl || "");
+
+    const fullImageUrl = rawPath && !rawPath.startsWith("http")
+      ? `${SERVER_URL}${rawPath.startsWith("/") ? "" : "/"}${rawPath}`
+      : rawPath;
+
+    setPreviewUrl(fullImageUrl || null);
+    setImageFile(null); // بنخلي الفايل بـ null عشان لو مرفعش صورة جديدة يفضل القديم
+
+    setShowAddModal(true);
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -82,16 +139,83 @@ const SparePartsProducts = () => {
     }
   };
 
-    const resetForm = () => {
+  //   const resetForm = () => {
+  //   setFormData({
+  //     name: "", description: "", price: "", stockQuantity: "",
+  //     make: "", forModel: "", year: "", condition: "",
+  //     horizontalPosition: "1", verticalPosition: "1", categoryName: ""
+  //   });
+  //   setImageFile(null);
+  //   setPreviewUrl(null);
+  //   setCategoryType("existing");  
+  // };
+
+  const resetForm = () => {
     setFormData({
       name: "", description: "", price: "", stockQuantity: "",
-      make: "", forModel: "", year: "", condition: "1",
+      make: "", forModel: "", year: "", condition: "",
       horizontalPosition: "1", verticalPosition: "1", categoryName: ""
     });
     setImageFile(null);
     setPreviewUrl(null);
-    setCategoryType("existing");  
+    setCategoryType("existing");
+    setEditingProductId(null); // تصفير الـ ID
   };
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!formData.name || !formData.price || !formData.stockQuantity || !formData.categoryName) {
+  //     alert("Please fill all required fields");
+  //     return;
+  //   }
+
+  //   const data = new FormData();
+  //   data.append("Name", formData.name);
+  //   data.append("Description", formData.description);
+  //   data.append("Price", formData.price);
+  //   data.append("StockQuantity", formData.stockQuantity);
+  //   data.append("Make", formData.make);
+  //   data.append("ForModel", formData.forModel);
+  //   data.append("Year", formData.year);
+  //   data.append("Condition", formData.condition);
+  //       // Horizontal & Vertical Position (اختياري)
+  //   if (formData.horizontalPosition) {
+  //     data.append("HorizontalPosition", formData.horizontalPosition);
+  //   }
+  //   if (formData.verticalPosition) {
+  //     data.append("VerticalPosition", formData.verticalPosition);
+  //   }
+  //   data.append("CategoryName", formData.categoryName);
+
+  //   if (imageFile) {
+  //     data.append("Image", imageFile);
+  //   }
+
+  //   try {
+  //     await api.post("/Products/Provider/add-product", data, {
+  //       headers: { "Content-Type": "multipart/form-data" },
+  //     });
+
+  //     alert("✅ Product added successfully!");
+
+  //     // إضافة الكاتيجوري الجديد للقائمة المحلية
+  //     if (categoryType === "new" && formData.categoryName) {
+  //       const newCatName = formData.categoryName.trim();
+  //       if (!categories.some(cat => cat === newCatName)) {
+  //         setCategories([...categories, newCatName]);
+  //       }
+  //     }
+
+  //     setShowAddModal(false);
+  //     fetchProducts();
+  //     resetForm();
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert("❌ Failed to add product: " + (err.response?.data?.message || err.message));
+  //   }
+  // };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.price || !formData.stockQuantity || !formData.categoryName) {
@@ -108,30 +232,33 @@ const SparePartsProducts = () => {
     data.append("ForModel", formData.forModel);
     data.append("Year", formData.year);
     data.append("Condition", formData.condition);
-        // Horizontal & Vertical Position (اختياري)
-    if (formData.horizontalPosition) {
-      data.append("HorizontalPosition", formData.horizontalPosition);
-    }
-    if (formData.verticalPosition) {
-      data.append("VerticalPosition", formData.verticalPosition);
-    }
+
+    if (formData.horizontalPosition) data.append("HorizontalPosition", formData.horizontalPosition);
+    if (formData.verticalPosition) data.append("VerticalPosition", formData.verticalPosition);
     data.append("CategoryName", formData.categoryName);
 
     if (imageFile) {
-      data.append("Image", imageFile);
+      data.append("Image", imageFile); // هتتبعت بس لو اختار صورة جديدة
     }
 
     try {
-      await api.post("/Products/Provider/add-product", data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      if (editingProductId) {
+        // تعديل (PUT)
+        await api.put(`/Products/Update-product/${editingProductId}`, data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        alert("✅ Product updated successfully!");
+      } else {
+        // إضافة (POST)
+        await api.post("/Products/Provider/add-product", data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        alert("✅ Product added successfully!");
+      }
 
-      alert("✅ Product added successfully!");
-
-      // إضافة الكاتيجوري الجديد للقائمة المحلية
       if (categoryType === "new" && formData.categoryName) {
         const newCatName = formData.categoryName.trim();
-        if (!categories.some(cat => cat === newCatName)) {
+        if (!categories.some(cat => (cat.name || cat) === newCatName)) {
           setCategories([...categories, newCatName]);
         }
       }
@@ -141,18 +268,18 @@ const SparePartsProducts = () => {
       resetForm();
     } catch (err) {
       console.error(err);
-      alert("❌ Failed to add product: " + (err.response?.data?.message || err.message));
+      alert(`❌ Failed to ${editingProductId ? 'update' : 'add'} product: ` + (err.response?.data?.message || err.message));
     }
   };
 
-    // Filtered and Sorted Products
+  // Filtered and Sorted Products
   const filteredProducts = React.useMemo(() => {
     let result = [...products];
 
     // Search
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase().trim();
-      result = result.filter(p => 
+      result = result.filter(p =>
         p.name?.toLowerCase().includes(term)
       );
     }
@@ -186,9 +313,12 @@ const SparePartsProducts = () => {
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="mb-0 fw-bold">Products</h2>
-        <button 
+        <button
           className="btn btn-dark px-4 py-2 d-flex align-items-center gap-2"
-          onClick={() => setShowAddModal(true)}
+          onClick={() => {
+            resetForm();
+            setShowAddModal(true);
+          }}
         >
           <i className="fas fa-plus"></i> Add New Product
         </button>
@@ -208,8 +338,8 @@ const SparePartsProducts = () => {
             </div>
 
             <div className="col-lg-2">
-              <select 
-                className="form-select" 
+              <select
+                className="form-select"
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
               >
@@ -223,23 +353,23 @@ const SparePartsProducts = () => {
             </div>
 
             <div className="col-lg-2">
-              <select 
-                className="form-select" 
+              <select
+                className="form-select"
                 value={filterCondition}
                 onChange={(e) => setFilterCondition(e.target.value)}
               >
                 <option value="">All Conditions</option>
-                <option value="1">New</option>
-                <option value="2">Used</option>
-                <option value="3">bishedRefur</option>
+                <option value="New">New</option>
+                <option value="Used">Used</option>
+                <option value="Refurbished">Refurbished</option>
               </select>
             </div>
 
             <div className="col-lg-3 text-lg-end">
               <div className="d-flex align-items-center justify-content-lg-end gap-2">
                 <span className="text-muted small">Sort by:</span>
-                <select 
-                  className="form-select w-auto" 
+                <select
+                  className="form-select w-auto"
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                 >
@@ -269,80 +399,84 @@ const SparePartsProducts = () => {
               </tr>
             </thead>
             <tbody>
-  {loading ? (
-    <tr>
-      <LoadingStyle/>
-      <td colSpan="6" className="text-center py-5">Loading products...</td>
-    </tr>
-  ) : filteredProducts.length === 0 ? (
-    <tr>
-      <td colSpan="6" className="text-center py-5 text-muted">No products found.</td>
-    </tr>
-  ) : (
-    filteredProducts.map((product) => {
-      // --- منطق "البروفايل" لبناء رابط الصورة ---
-      const SERVER_URL = "http://careboxapi.runasp.net";
-      
-      // بنجيب المسار من المصفوفة images (أول عنصر) زي ما الكونسول قال
-      const rawPath = (product.images && product.images.length > 0) 
-        ? product.images[0].imageUrl 
-        : (product.imageUrl || ""); // احتياطي لو الاسم اتغير
+              {loading ? (
+                <tr>
+                  <LoadingStyle />
+                  <td colSpan="6" className="text-center py-5">Loading products...</td>
+                </tr>
+              ) : filteredProducts.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-5 text-muted">No products found.</td>
+                </tr>
+              ) : (
+                filteredProducts.map((product) => {
+                  // --- منطق "البروفايل" لبناء رابط الصورة ---
+                  const SERVER_URL = "http://careboxapi.runasp.net";
 
-      const fullImageUrl = rawPath && !rawPath.startsWith("http")
-        ? `${SERVER_URL}${rawPath.startsWith("/") ? "" : "/"}${rawPath}`
-        : (rawPath || "https://via.placeholder.com/60?text=No+Img");
-      // ---------------------------------------
+                  // بنجيب المسار من المصفوفة images (أول عنصر) زي ما الكونسول قال
+                  const rawPath = (product.images && product.images.length > 0)
+                    ? product.images[0].imageUrl
+                    : (product.imageUrl || ""); // احتياطي لو الاسم اتغير
 
-      return (
-        <tr key={product.productId}>
-          <td>
-            <div className="d-flex align-items-center gap-3">
-              {/* استبدلنا السطر القديم بالصورة المظبوطة */}
-              <img 
-                src={fullImageUrl} 
-                alt={product.name}
-                style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "6px" }}
-                onError={(e) => { e.target.src = "https://via.placeholder.com/60?text=No+Img"; }}
-              />
-              <div>
-                <div className="fw-semibold">{product.name}</div>
-                <small className="text-muted">ID: {product.productId}</small>
-              </div>
-            </div>
-          </td>
-          <td>{product.categoryName || "—"}</td>
-          <td>
-            <Badge 
-              bg={
-                product.condition === 1 || product.condition === "1" ? "success" :
-                product.condition === 2 || product.condition === "2" ? "warning" : 
-                "secondary"
-              }
-            >
-              {product.condition === 1 || product.condition === "1" ? "New" :
-               product.condition === 2 || product.condition === "2" ? "Used" : 
-               "Refurbished"}
-            </Badge>
-          </td>
-          <td><strong>{Number(product.price || 0).toLocaleString()} LE</strong></td>
-          <td>
-            <span className={product.stockQuantity < 10 ? "text-danger fw-bold" : ""}>
-              {product.stockQuantity}
-            </span>
-          </td>
-          <td className="text-center">
-            <button className="btn btn-link text-primary p-1 me-2">
-              <i className="fas fa-pencil"></i>
-            </button>
-            <button className="btn btn-link text-danger p-1">
-              <i className="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-      );
-    })
-  )}
-</tbody>
+                  const fullImageUrl = rawPath && !rawPath.startsWith("http")
+                    ? `${SERVER_URL}${rawPath.startsWith("/") ? "" : "/"}${rawPath}`
+                    : (rawPath || "https://via.placeholder.com/60?text=No+Img");
+                  // ---------------------------------------
+
+                  return (
+                    <tr key={product.productId}>
+                      <td>
+                        <div className="d-flex align-items-center gap-3">
+                          {/* استبدلنا السطر القديم بالصورة المظبوطة */}
+                          <img
+                            src={fullImageUrl}
+                            alt={product.name}
+                            style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "6px" }}
+                            onError={(e) => { e.target.src = "https://via.placeholder.com/60?text=No+Img"; }}
+                          />
+                          <div>
+                            <div className="fw-semibold">{product.name}</div>
+                            <small className="text-muted">ID: {product.productId}</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>{product.categoryName || "—"}</td>
+                      <td>
+                        <Badge
+                          bg={
+                            product.condition === "New" ? "success" :
+                              product.condition === "Used" ? "warning" :
+                                "secondary"
+                          }
+                        >
+                          {product.condition}
+                        </Badge>
+                      </td>
+                      <td><strong>{Number(product.price || 0).toLocaleString()} EGP</strong></td>
+                      <td>
+                        <span className={product.stockQuantity < 10 ? "text-danger fw-bold" : ""}>
+                          {product.stockQuantity}
+                        </span>
+                      </td>
+                      <td className="text-center">
+                        <button
+                          className="btn btn-link text-primary p-1 me-2"
+                          onClick={() => handleEditClick(product)}
+                        >
+                          <i className="fas fa-pencil"></i>
+                        </button>
+                        <button
+                          className="btn btn-link text-danger p-1"
+                          onClick={() => handleDelete(product.productId)}
+                        >
+                          <i className="fas fa-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
           </table>
         </div>
       </div>
@@ -350,14 +484,14 @@ const SparePartsProducts = () => {
       {/* ====================== Add New Product Modal ====================== */}
       <Modal show={showAddModal} onHide={() => setShowAddModal(false)} size="lg" centered>
         <Modal.Header closeButton>
-          <Modal.Title>Add New Product</Modal.Title>
+          <Modal.Title>{editingProductId ? "Edit Product" : "Add New Product"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
             {/* Product Image */}
             <div className="mb-4">
               <Form.Label className="fw-semibold">Product Image</Form.Label>
-              <div 
+              <div
                 className="border border-2 border-dashed rounded-3 p-5 text-center"
                 style={{ backgroundColor: "#f8f9fa", cursor: "pointer" }}
                 onClick={() => document.getElementById("imageInput").click()}
@@ -396,7 +530,6 @@ const SparePartsProducts = () => {
                 </Form.Group>
               </Col>
 
-              {/* Category Section - زي خدمات الصيانة */}
               <Col md={12}>
                 <Form.Group className="mb-3">
                   <Form.Label>Category</Form.Label>
@@ -425,7 +558,7 @@ const SparePartsProducts = () => {
                   </div>
 
                   {categoryType === "existing" && (
-                    <Form.Select 
+                    <Form.Select
                       name="categoryName"
                       value={formData.categoryName}
                       onChange={handleChange}
@@ -518,13 +651,13 @@ const SparePartsProducts = () => {
                 </Form.Group>
               </Col>
 
-                            {/* Position - اختياري */}
+              {/* Position - اختياري */}
               <Col md={4}>
                 <Form.Group>
-                  <Form.Label>Horizontal Position <span className="text-muted"></span></Form.Label>
-                  <Form.Select 
-                    name="horizontalPosition"
-                    value={formData.horizontalPosition}
+                  <Form.Label>Vertical Position <span className="text-muted"></span></Form.Label>
+                  <Form.Select
+                    name="verticalPosition"
+                    value={formData.verticalPosition}
                     onChange={handleChange}
                   >
                     <option value="">none</option>
@@ -536,10 +669,10 @@ const SparePartsProducts = () => {
 
               <Col md={4}>
                 <Form.Group>
-                  <Form.Label>Vertical Position <span className="text-muted"></span></Form.Label>
-                  <Form.Select 
-                    name="verticalPosition"
-                    value={formData.verticalPosition}
+                  <Form.Label>Horizontal Position <span className="text-muted"></span></Form.Label>
+                  <Form.Select
+                    name="horizontalPosition"
+                    value={formData.horizontalPosition}
                     onChange={handleChange}
                   >
                     <option value="">none</option>
@@ -549,29 +682,29 @@ const SparePartsProducts = () => {
                 </Form.Group>
               </Col>
 
-                            <Col md={12}>
+              <Col md={12}>
                 <Form.Group>
                   <Form.Label>Condition</Form.Label>
                   <div className="d-flex gap-4 mt-2">
-                    <Form.Check 
-                      type="radio" 
-                      label="New" 
+                    <Form.Check
+                      type="radio"
+                      label="New"
                       name="condition"
                       value="1"
                       checked={formData.condition === "1"}
                       onChange={handleChange}
                     />
-                    <Form.Check 
-                      type="radio" 
-                      label="Used" 
+                    <Form.Check
+                      type="radio"
+                      label="Used"
                       name="condition"
                       value="2"
                       checked={formData.condition === "2"}
                       onChange={handleChange}
                     />
-                    <Form.Check 
-                      type="radio" 
-                      label="Refurbished" 
+                    <Form.Check
+                      type="radio"
+                      label="Refurbished"
                       name="condition"
                       value="3"
                       checked={formData.condition === "3"}
@@ -603,7 +736,7 @@ const SparePartsProducts = () => {
             Cancel
           </Button>
           <Button variant="dark" onClick={handleSubmit}>
-            Save Product
+            {editingProductId ? "Update Product" : "Save Product"}
           </Button>
         </Modal.Footer>
       </Modal>

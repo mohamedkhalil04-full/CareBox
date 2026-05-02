@@ -88,7 +88,7 @@ const AllRequests = () => {
   };
 
   const getStatusBadge = (status) => {
-    const s = statusMap[status] || { label: status || "Unknown", variant: "secondary" };
+    const s = statusMap[status] || { label: status , variant: "primary" };
     return <Badge bg={s.variant} className="px-3 py-2">{s.label}</Badge>;
   };
 
