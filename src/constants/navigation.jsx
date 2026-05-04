@@ -6,7 +6,7 @@ export const getSidebarItems = (providerType) => {
   // العناصر المشتركة بين الجميع
   const commonItems = [
     { 
-      path: "/home", 
+      path: "/", 
       label: "Home", 
       icon: "fa-regular fa-house" 
     },
@@ -61,7 +61,7 @@ export const getSidebarItems = (providerType) => {
 
     case PROVIDER_TYPES.SPARE_PARTS:     // قطع غيار 
       return [
-        { path: "/home", label: "Dashboard", icon: "fa-solid fa-chart-bar" },
+        { path: "/", label: "Dashboard", icon: "fa-solid fa-chart-bar" },
         { path: "/services", label: "Products", icon: "fa-solid fa-cube" },
        { path: "/bookings", label: "Orders", icon: "fa-solid fa-cart-arrow-down" },
        { path: "/inventory", label: "Inventory", icon: "fa-solid fa-boxes-stacked" },
@@ -70,7 +70,7 @@ export const getSidebarItems = (providerType) => {
 
     case PROVIDER_TYPES.EMERGENCY:       // طوارئ
       return [
-        { path: "/home", label: "Dashboard", icon: "fa-solid fa-chart-bar" },
+        { path: "/", label: "Dashboard", icon: "fa-solid fa-chart-bar" },
         { path: "/EmergencyRequests", label: "Emergency Requests", icon: "fa-solid fa-triangle-exclamation" },
         { path: "/allRequests", label: "All Requests", icon: "fa-solid fa-clipboard-list"},
         // { path: "/Notifications", label: "Notifications", icon: "fa-solid fa-truck-medical"},
