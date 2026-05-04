@@ -3,7 +3,7 @@ import { useProviderType } from '../../hooks/useProviderType';
 
 import CarCareHome from '../car-care/dashboard/Home';
 import MaintenanceHome from '../maintenance/dashboard/Home';
-import EmergencyHome from '../emergency/dashboard/Home';
+import EmergencyHome from '../emergency/dashboard/Dashboard';
 import SparePartsHome from '../spare-parts/dashboard/Home';
 
 const HomeWrapper = () => {

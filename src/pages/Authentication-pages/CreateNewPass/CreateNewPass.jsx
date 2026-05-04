@@ -30,7 +30,7 @@ const CreateNewPass = () => {
         alert("✅ Password reset successfully!");
         localStorage.removeItem('otpFlow');
         localStorage.removeItem('resetOtp');
-        navigate("/");
+        navigate("/login");
       } else {
         alert("❌ Failed to reset password.");
       }

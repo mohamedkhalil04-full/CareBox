@@ -139,17 +139,6 @@ const SparePartsProducts = () => {
     }
   };
 
-  //   const resetForm = () => {
-  //   setFormData({
-  //     name: "", description: "", price: "", stockQuantity: "",
-  //     make: "", forModel: "", year: "", condition: "",
-  //     horizontalPosition: "1", verticalPosition: "1", categoryName: ""
-  //   });
-  //   setImageFile(null);
-  //   setPreviewUrl(null);
-  //   setCategoryType("existing");  
-  // };
-
   const resetForm = () => {
     setFormData({
       name: "", description: "", price: "", stockQuantity: "",
@@ -161,60 +150,6 @@ const SparePartsProducts = () => {
     setCategoryType("existing");
     setEditingProductId(null); // تصفير الـ ID
   };
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   if (!formData.name || !formData.price || !formData.stockQuantity || !formData.categoryName) {
-  //     alert("Please fill all required fields");
-  //     return;
-  //   }
-
-  //   const data = new FormData();
-  //   data.append("Name", formData.name);
-  //   data.append("Description", formData.description);
-  //   data.append("Price", formData.price);
-  //   data.append("StockQuantity", formData.stockQuantity);
-  //   data.append("Make", formData.make);
-  //   data.append("ForModel", formData.forModel);
-  //   data.append("Year", formData.year);
-  //   data.append("Condition", formData.condition);
-  //       // Horizontal & Vertical Position (اختياري)
-  //   if (formData.horizontalPosition) {
-  //     data.append("HorizontalPosition", formData.horizontalPosition);
-  //   }
-  //   if (formData.verticalPosition) {
-  //     data.append("VerticalPosition", formData.verticalPosition);
-  //   }
-  //   data.append("CategoryName", formData.categoryName);
-
-  //   if (imageFile) {
-  //     data.append("Image", imageFile);
-  //   }
-
-  //   try {
-  //     await api.post("/Products/Provider/add-product", data, {
-  //       headers: { "Content-Type": "multipart/form-data" },
-  //     });
-
-  //     alert("✅ Product added successfully!");
-
-  //     // إضافة الكاتيجوري الجديد للقائمة المحلية
-  //     if (categoryType === "new" && formData.categoryName) {
-  //       const newCatName = formData.categoryName.trim();
-  //       if (!categories.some(cat => cat === newCatName)) {
-  //         setCategories([...categories, newCatName]);
-  //       }
-  //     }
-
-  //     setShowAddModal(false);
-  //     fetchProducts();
-  //     resetForm();
-  //   } catch (err) {
-  //     console.error(err);
-  //     alert("❌ Failed to add product: " + (err.response?.data?.message || err.message));
-  //   }
-  // };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -244,7 +179,7 @@ const SparePartsProducts = () => {
     try {
       if (editingProductId) {
         // تعديل (PUT)
-        await api.put(`/Products/Update-product/${editingProductId}`, data, {
+        await api.put(`Products/Update-product/${editingProductId}`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         alert("✅ Product updated successfully!");

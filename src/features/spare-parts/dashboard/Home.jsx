@@ -258,7 +258,7 @@ const SparePartsHome = () => {
           icon="fas fa-shopping-bag"
           label="Total Orders"
           value={Number(totalOrdersPie).toLocaleString()}
-          trend={12.5}
+          trend={100}
           trendLabel="vs last month"
           iconColor="#3b82f6"
           loading={statsLoading}
@@ -267,7 +267,7 @@ const SparePartsHome = () => {
           icon="fas fa-wallet"
           label="Total Income"
           value={`${Number(stats.totalIncome).toLocaleString()} EGP`}
-          trend={8.2}
+          trend={100}
           trendLabel="vs last month"
           iconColor="#22c55e"
           loading={statsLoading}
@@ -276,7 +276,7 @@ const SparePartsHome = () => {
           icon="fas fa-times-circle"
           label="Cancelled Orders"
           value={Number(stats.cancelledOrders).toLocaleString()}
-          trend={-2.1}
+          trend={0}
           trendLabel="vs last month"
           iconColor="#ef4444"
           loading={statsLoading}

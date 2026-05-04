@@ -201,7 +201,7 @@ const SideBar = () => {
       localStorage.removeItem("token");
       localStorage.removeItem("isLoggedIn");
       alert("Logged out successfully!");
-      navigate("/"); 
+      navigate("/login"); 
     }
   };
 

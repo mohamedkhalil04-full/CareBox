@@ -64,7 +64,7 @@ const Head = () => {
       className="d-flex align-items-center justify-content-between px-4"
       style={{
         height: "64px",
-        borderBottom: "1px solid gray",
+        borderBottom: ".5px solid gray",
         // ...getHeaderStyle(),
       }}
     >
@@ -74,7 +74,7 @@ const Head = () => {
         </h2>
 
       <div className="me-3 p-2">
-        <img src={logo} alt="logo" width={90} height={60}/>
+        <img src={logo} alt="logo" width={90} height={55}/>
       </div>
 
       

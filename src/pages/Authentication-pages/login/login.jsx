@@ -22,7 +22,7 @@ const Login = () => {
         localStorage.setItem("providerType", response.data.providerType);
       }
       alert("✅ Welcome Back!");
-      navigate("/home");
+      navigate("/");
     } catch (error) {
       const errorMsg = error.response?.data?.message || "Invalid email or password or may be bad network";
       alert(`❌ ${errorMsg}`);

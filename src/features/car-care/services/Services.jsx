@@ -18,6 +18,7 @@ const CarCareServices = () => {
 
       if (apiResponse?.success && Array.isArray(apiResponse.data)) {
         setServices(apiResponse.data);
+        // console.log(apiResponse.data)
       } else {
         console.warn("Unexpected API format:", apiResponse);
         setServices([]);

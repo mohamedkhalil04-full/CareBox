@@ -43,7 +43,7 @@ function App() {
         <Routes>
           {/* Main LayOut "protected routes" for Dashboard */}
           <Route element={<MainLayout />}>
-            <Route path="/home" element={<HomeWrapper />} />
+            <Route path="/" element={<HomeWrapper />} />
             <Route path="/bookings" element={<BookingWrapper />} />
             <Route path="/clients" element={<Clients />} />
             <Route path="/services" element={<ServiceWrapper />} />
@@ -66,7 +66,7 @@ function App() {
 
           {/* authontication routes*/}
           <Route element={<AuthLayout />}>
-            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/otp" element={<OTP />} />
             <Route path="/createnewpass" element={<CreateNewPass />} />
