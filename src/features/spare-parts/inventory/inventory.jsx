@@ -58,7 +58,7 @@ const Inventory = () => {
 
     try {
       await api.patch(`/Products/Provider/UpdateProductCountStock/${productId}`, {
-        count: newCount,
+        newQuantity : newCount,
       });
 
       alert("Stock updated successfully");

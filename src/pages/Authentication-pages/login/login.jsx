@@ -1,5 +1,5 @@
 import "./login.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from '../../../api/axiosInstance'
 
@@ -9,6 +9,16 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // فحص صارم زي اللي عملناه في الرئيسية
+    const token = localStorage.getItem("token");
+    const isAuthenticated = token && token !== "null" && token !== "undefined";
+    
+    // لو مسجل دخول فعلاً، رجعه للـ Dashboard وماتفتحش الفورم
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

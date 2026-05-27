@@ -67,10 +67,29 @@ const SparePartsOrders = () => {
   }, [activeTab]);
 
   // Search
-  const filteredOrders = orders.filter((order) =>
-    order.orderCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.clientName?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Search and Status Filter Logic
+  const filteredOrders = orders.filter((order) => {
+    const term = searchTerm.toLowerCase().trim();
+
+    // 1. معالجة مشكلة الفلتر: التأكد إن الطلب بيطابق الـ Tab المفتوح حالياً
+    const matchesStatus = 
+      activeTab === "all" || 
+      (order.statusName && order.statusName.toLowerCase() === activeTab.toLowerCase());
+
+    // 2. معالجة وتوسيع البحث: يشمل الـ ID، اسم العميل، بيانات العربية، نوع التوصيل، والمنتجات
+    const matchesSearch = term === "" || (
+      (order.orderCode && order.orderCode.toLowerCase().includes(term)) ||
+      (order.clientName && order.clientName.toLowerCase().includes(term)) ||
+      (order.carDetails && order.carDetails.toLowerCase().includes(term)) ||
+      (order.deliveryType && order.deliveryType.toLowerCase().includes(term)) ||
+      (order.items && order.items.some(item => 
+        item.productName && item.productName.toLowerCase().includes(term)
+      ))
+    );
+
+    // عرض الطلب فقط لو بيحقق شرط الحالة وشرط البحث مع بعض
+    return matchesStatus && matchesSearch;
+  });
 
   // Status Badge
   const getStatusBadge = (statusName) => {

@@ -1,6 +1,24 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import api from "../../../api/axiosInstance";
 
+const STATUS_LABEL_TO_NUM = {
+  pending:    1,
+  accepted:   2,
+  "on the way": 3,
+  ontheway:   3,
+  arrived:    4,
+  completed:  5,
+  cancelled:  6,
+};
+
+/** Accepts a string ("Accepted") OR a number (2) and always returns a number. */
+const normaliseStatus = (raw) => {
+  if (raw == null) return null;
+  const n = Number(raw);
+  if (!isNaN(n) && n > 0) return n;                          // already numeric
+  return STATUS_LABEL_TO_NUM[String(raw).toLowerCase().replace(/\s+/g, " ").trim()] ?? null;
+};
+
 const STATUS_MAP = {
   1: { label: "Pending",    variant: "warning",  textDark: true  },
   2: { label: "Accepted",   variant: "info",     textDark: false },
@@ -13,8 +31,10 @@ const STATUS_MAP = {
 const STATUS_TO_STEP = { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 4 };
 const steps = ["Pending", "Accepted", "On the way", "Arrived", "Completed"];
 
+/** BUG #2 FIX — always resolves the correct Bootstrap colour variant. */
 const StatusBadge = ({ status }) => {
-  const s = STATUS_MAP[status] || { label: String(status || "Unknown"), variant: "secondary", textDark: false };
+  const key = normaliseStatus(status);
+  const s   = STATUS_MAP[key] ?? { label: String(status ?? "Unknown"), variant: "secondary", textDark: false };
   return (
     <span
       className={`badge bg-${s.variant}${s.textDark ? " text-dark" : ""} px-3 py-2`}
@@ -25,6 +45,9 @@ const StatusBadge = ({ status }) => {
   );
 };
 
+// ─────────────────────────────────────────────
+//  Misc helpers
+// ─────────────────────────────────────────────
 const fmt = (v, d = 2) =>
   v == null ? "0.00" : Number(v).toFixed(d);
 
@@ -53,25 +76,80 @@ const Toast = ({ toasts }) => (
   </div>
 );
 
-  // Invoice Section
-  
-const InvoiceSection = ({ requestId, toast }) => {
+// ─────────────────────────────────────────────
+//  Invoice ID helpers
+// ─────────────────────────────────────────────
+
+/**
+ * BUG #6 PRESERVE — extractItemId & normaliseItems keep the correct per-item IDs
+ * so Delete/Update always use invoiceDetailId (item-level) and Add uses requestId
+ * (parent-level). This logic is untouched from the original working version.
+ */
+const extractItemId = (item) =>
+  item.invoiceDetailId ??
+  item.invoiceDetailID ??
+  item.itemId ??
+  item.itemID ??
+  item.id ??
+  null;
+
+const normaliseItems = (raw) =>
+  (Array.isArray(raw) ? raw : [])
+    .filter(item => {
+      const desc = (item.itemDescription || item.description || "").trim();
+      return desc && desc !== "0";
+    })
+    .map(item => ({
+      invoiceDetailId: extractItemId(item),
+      itemDescription: (item.itemDescription || item.description || "").trim(),
+      price:           Number(item.price ?? item.unitPrice ?? 0),
+    }));
+
+const calcTotals = (items) => {
+  const total = items.reduce((s, i) => s + i.price, 0);
+  return { total };
+};
+
+// ─────────────────────────────────────────────
+//  Invoice Totals Block
+// ─────────────────────────────────────────────
+const InvoiceTotals = ({ items }) => {
+  const { total } = calcTotals(items);
+  return (
+    <div className="px-4 py-4" style={{ background: "#f8fafc", borderTop: "1px solid #e2e8f0" }}>
+      <div className="ms-auto" style={{ maxWidth: 300 }}>
+        <div
+          className="d-flex justify-content-between fw-bold"
+          style={{ fontSize: "1.05rem" }}
+        >
+          <span>Total</span>
+          <span className="text-primary">{fmt(total)} EGP</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────
+//  InvoiceViewSection — read-only (status = 5 Completed)
+// ─────────────────────────────────────────────
+const InvoiceViewSection = ({ requestId }) => {
+  const [items,   setItems]   = useState([]);
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [editingId, setEditingId] = useState(null);
-  const [editPrice, setEditPrice] = useState("");
-  const [newItem, setNewItem] = useState({ itemDescription: "", price: "" });
-  const [addingItem, setAddingItem] = useState(false);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [error,   setError]   = useState(null);
 
   const fetchInvoice = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      const res = await api.get(`/Invoices/GetInvoiceByEmergencyRequestId/${requestId}`);
-      setInvoice(res.data?.data || res.data || null);
+      const res  = await api.get(`/Invoices/GetInvoiceByEmergencyRequestId/${requestId}`);
+      const data = res.data?.data ?? res.data ?? null;
+      setInvoice(data);
+      setItems(normaliseItems(data?.invoiceDetails ?? data?.items));
     } catch (err) {
-      console.error("Invoice error:", err);
-      setInvoice(null);
+      console.error("Invoice fetch error:", err);
+      setError("Could not load invoice.");
     } finally {
       setLoading(false);
     }
@@ -79,50 +157,180 @@ const InvoiceSection = ({ requestId, toast }) => {
 
   useEffect(() => { fetchInvoice(); }, [fetchInvoice]);
 
-  const items = invoice?.invoiceDetails ?? invoice?.items ?? [];
-  const subtotal = items.reduce((s, i) => s + Number(i.price ?? i.unitPrice ?? 0), 0);
-  const tax = subtotal * 0.14;
-  const total = subtotal + tax;
+  if (loading) return (
+    <div className="card border-0 shadow-sm rounded-4 p-4 mt-4 d-flex align-items-center gap-3 flex-row">
+      <div className="spinner-border spinner-border-sm text-primary" />
+      <span className="text-muted small">Loading invoice...</span>
+    </div>
+  );
 
+  if (error) return (
+    <div className="alert alert-warning mt-4 rounded-4">{error}</div>
+  );
+
+  return (
+    <div className="card border-0 shadow-sm rounded-4 mt-4" style={{ overflow: "hidden" }}>
+      {/* Header */}
+      <div
+        className="p-4 d-flex justify-content-between align-items-center"
+        style={{ background: "linear-gradient(135deg,#0f3460 0%,#16213e 100%)" }}
+      >
+        <div>
+          <h5 className="fw-bold text-white mb-1">
+            <i className="fa-solid fa-file-invoice me-2" />Service Invoice
+          </h5>
+          <p className="text-white-50 small mb-0">
+            Invoice #{invoice?.invoiceId ?? invoice?.id ?? "—"} · REQ-{requestId}
+          </p>
+        </div>
+        <span
+          className="badge bg-success px-3 py-2 fw-semibold"
+          style={{ borderRadius: 10, fontSize: "0.82rem" }}
+        >
+          <i className="fa-solid fa-lock me-1" />Completed
+        </span>
+      </div>
+
+      {/* Items — read-only */}
+      <div className="table-responsive">
+        <table className="table align-middle mb-0" style={{ fontSize: "0.88rem" }}>
+          <thead style={{ background: "#f8fafc" }}>
+            <tr>
+              <th className="px-4 py-3 fw-semibold text-muted small">#</th>
+              <th className="px-4 py-3 fw-semibold text-muted small">Description</th>
+              <th className="px-4 py-3 fw-semibold text-muted small text-end">Price (EGP)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="text-center py-5 text-muted">
+                  <i className="fa-solid fa-receipt fa-2x d-block mb-2 opacity-25" />
+                  No items on this invoice
+                </td>
+              </tr>
+            ) : (
+              items.map((item, idx) => (
+                <tr key={item.invoiceDetailId ?? idx} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                  <td className="px-4 text-muted">{idx + 1}</td>
+                  <td className="px-4 fw-medium">{item.itemDescription}</td>
+                  <td className="px-4 text-end"><strong>{fmt(item.price)}</strong></td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+      <InvoiceTotals items={items} />
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────
+//  InvoiceEditSection — full CRUD (statuses 2–4)
+// ─────────────────────────────────────────────
+const InvoiceEditSection = ({ requestId, toast }) => {
+  const [items,       setItems]       = useState([]);
+  const [invoice,     setInvoice]     = useState(null);
+  const [loading,     setLoading]     = useState(true);
+  const [editingId,   setEditingId]   = useState(null);
+  const [editPrice,   setEditPrice]   = useState("");
+  const [editSaving,  setEditSaving]  = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newItem,     setNewItem]     = useState({ itemDescription: "", price: "" });
+  const [addSaving,   setAddSaving]   = useState(false);
+  const [deletingId,  setDeletingId]  = useState(null);
+
+  const fetchInvoice = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res  = await api.get(`/Invoices/GetInvoiceByEmergencyRequestId/${requestId}`);
+      const data = res.data?.data ?? res.data ?? null;
+      setInvoice(data);
+      setItems(normaliseItems(data?.invoiceDetails ?? data?.items));
+    } catch (err) {
+      console.error("Invoice fetch error:", err);
+      setInvoice(null);
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [requestId]);
+
+  useEffect(() => { fetchInvoice(); }, [fetchInvoice]);
+
+  // ── ADD — uses parent requestId as bookingId (BUG #6 preserved) ──
   const handleAddItem = async () => {
-    if (!newItem.itemDescription.trim() || !newItem.price) return;
-    setAddingItem(true);
+    const desc  = newItem.itemDescription.trim();
+    const price = parseFloat(newItem.price);
+    if (!desc || isNaN(price) || price < 0) {
+      toast.push("Please enter a valid description and price.", "danger");
+      return;
+    }
+    setAddSaving(true);
     try {
       await api.put("/Invoices/AddCustomItemsToInvoice", {
-        bookingId: invoice?.invoiceId ?? invoice?.bookingId ?? invoice?.id,
-        items: [{ itemDescription: newItem.itemDescription, price: Number(newItem.price) }],
+        bookingId: requestId,
+        items: [{ itemDescription: desc, price }],
       });
-      toast.push("Item added successfully");
+      await fetchInvoice();
       setNewItem({ itemDescription: "", price: "" });
       setShowAddForm(false);
-      fetchInvoice();
-    } catch {
-      toast.push("Failed to add item", "danger");
+      toast.push("Item added successfully.");
+    } catch (err) {
+      toast.push("Failed to add item: " + (err.response?.data?.message || err.message), "danger");
     } finally {
-      setAddingItem(false);
+      setAddSaving(false);
     }
   };
 
-  const handleSaveEdit = async (detailId) => {
-    if (!editPrice) return;
+  // ── UPDATE — uses item's own invoiceDetailId (BUG #6 preserved) ──
+  const handleSaveEdit = async (invoiceDetailId) => {
+    const price = parseFloat(editPrice);
+    if (isNaN(price) || price < 0) {
+      toast.push("Please enter a valid price.", "danger");
+      return;
+    }
+    if (!invoiceDetailId) {
+      toast.push("Cannot update: item has no server ID. Try re-adding it.", "danger");
+      return;
+    }
+    setEditSaving(true);
     try {
-      await api.patch(`/Invoices/updateprice-item-FromInvoice/${detailId}`, Number(editPrice));
-      toast.push("Price updated");
+      await api.patch(
+        `/Invoices/updateprice-item-FromInvoice/${invoiceDetailId}`,
+        price,
+        { headers: { "Content-Type": "application/json" } }
+      );
+      setItems(prev =>
+        prev.map(it => it.invoiceDetailId === invoiceDetailId ? { ...it, price } : it)
+      );
       setEditingId(null);
-      fetchInvoice();
-    } catch {
-      toast.push("Failed to update price", "danger");
+      setEditPrice("");
+      toast.push("Price updated successfully.");
+    } catch (err) {
+      toast.push("Failed to update price: " + (err.response?.data?.message || err.message), "danger");
+    } finally {
+      setEditSaving(false);
     }
   };
 
-  const handleDelete = async (detailId) => {
-    if (!window.confirm("Delete this item?")) return;
+  // ── DELETE — uses item's own invoiceDetailId (BUG #6 preserved) ──
+  const handleDelete = async (invoiceDetailId) => {
+    if (!window.confirm("Are you sure you want to delete this item from the invoice?")) return;
+    if (!invoiceDetailId) {
+      setItems(prev => prev.filter(it => it.invoiceDetailId !== invoiceDetailId));
+      return;
+    }
+    setDeletingId(invoiceDetailId);
     try {
-      await api.delete(`/Invoices/Delete-item-FromInvoice/${detailId}`);
-      toast.push("Item removed");
-      fetchInvoice();
-    } catch {
-      toast.push("Failed to delete item", "danger");
+      await api.delete(`/Invoices/Delete-item-FromInvoice/${invoiceDetailId}`);
+      setItems(prev => prev.filter(it => it.invoiceDetailId !== invoiceDetailId));
+      toast.push("Item deleted successfully.");
+    } catch (err) {
+      toast.push("Failed to delete item: " + (err.response?.data?.message || err.message), "danger");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -137,8 +345,10 @@ const InvoiceSection = ({ requestId, toast }) => {
     <div className="card border-0 shadow-sm rounded-4 mt-4" style={{ overflow: "hidden" }}>
 
       {/* ── Invoice Header ── */}
-      <div className="p-4 d-flex justify-content-between align-items-center"
-        style={{ background: "linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%)" }}>
+      <div
+        className="p-4 d-flex justify-content-between align-items-center"
+        style={{ background: "linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%)" }}
+      >
         <div>
           <h5 className="fw-bold text-white mb-1">
             <i className="fa-solid fa-file-invoice me-2" />Service Invoice
@@ -150,7 +360,7 @@ const InvoiceSection = ({ requestId, toast }) => {
         <button
           className="btn btn-sm btn-light fw-semibold px-3"
           style={{ borderRadius: 10 }}
-          onClick={() => setShowAddForm(v => !v)}
+          onClick={() => { setShowAddForm(v => !v); setNewItem({ itemDescription: "", price: "" }); }}
         >
           <i className={`fa-solid fa-${showAddForm ? "minus" : "plus"} me-1`} />
           {showAddForm ? "Cancel" : "Add Item"}
@@ -168,7 +378,9 @@ const InvoiceSection = ({ requestId, toast }) => {
                 placeholder="e.g. Towing Fee"
                 value={newItem.itemDescription}
                 onChange={e => setNewItem(v => ({ ...v, itemDescription: e.target.value }))}
+                onKeyDown={e => e.key === "Enter" && !addSaving && handleAddItem()}
                 style={{ borderRadius: 8 }}
+                disabled={addSaving}
               />
             </div>
             <div className="col-3">
@@ -179,17 +391,19 @@ const InvoiceSection = ({ requestId, toast }) => {
                 placeholder="0.00"
                 value={newItem.price}
                 onChange={e => setNewItem(v => ({ ...v, price: e.target.value }))}
+                onKeyDown={e => e.key === "Enter" && !addSaving && handleAddItem()}
                 style={{ borderRadius: 8 }}
+                disabled={addSaving}
               />
             </div>
             <div className="col-3">
               <button
                 className="btn btn-primary btn-sm w-100 fw-semibold"
                 onClick={handleAddItem}
-                disabled={addingItem}
+                disabled={addSaving}
                 style={{ borderRadius: 8 }}
               >
-                {addingItem
+                {addSaving
                   ? <span className="spinner-border spinner-border-sm" />
                   : <><i className="fa-solid fa-plus me-1" />Add</>}
               </button>
@@ -219,12 +433,14 @@ const InvoiceSection = ({ requestId, toast }) => {
               </tr>
             ) : (
               items.map((item, idx) => {
-                const detailId = item.invoiceDetailId ?? item.id ?? idx;
-                const isEditing = editingId === detailId;
+                const { invoiceDetailId } = item;
+                const isEditing  = editingId  === invoiceDetailId;
+                const isDeleting = deletingId === invoiceDetailId;
+
                 return (
-                  <tr key={detailId} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                  <tr key={invoiceDetailId ?? `local-${idx}`} style={{ borderBottom: "1px solid #f1f5f9" }}>
                     <td className="px-4 text-muted">{idx + 1}</td>
-                    <td className="px-4 fw-medium">{item.itemDescription ?? item.description ?? "—"}</td>
+                    <td className="px-4 fw-medium">{item.itemDescription}</td>
                     <td className="px-4 text-end">
                       {isEditing ? (
                         <input
@@ -233,21 +449,33 @@ const InvoiceSection = ({ requestId, toast }) => {
                           style={{ width: 110, borderRadius: 8 }}
                           value={editPrice}
                           onChange={e => setEditPrice(e.target.value)}
+                          onKeyDown={e => e.key === "Enter" && !editSaving && handleSaveEdit(invoiceDetailId)}
                           autoFocus
+                          disabled={editSaving}
                         />
                       ) : (
-                        <strong>{fmt(item.price ?? item.unitPrice)}</strong>
+                        <strong>{fmt(item.price)}</strong>
                       )}
                     </td>
                     <td className="px-4 text-center">
                       {isEditing ? (
                         <div className="d-flex gap-1 justify-content-center">
-                          <button className="btn btn-success btn-sm px-3" style={{ borderRadius: 8 }}
-                            onClick={() => handleSaveEdit(detailId)}>
-                            <i className="fa-solid fa-check" />
+                          <button
+                            className="btn btn-success btn-sm px-3"
+                            style={{ borderRadius: 8 }}
+                            onClick={() => handleSaveEdit(invoiceDetailId)}
+                            disabled={editSaving}
+                          >
+                            {editSaving
+                              ? <span className="spinner-border spinner-border-sm" />
+                              : <i className="fa-solid fa-check" />}
                           </button>
-                          <button className="btn btn-light btn-sm px-3" style={{ borderRadius: 8 }}
-                            onClick={() => setEditingId(null)}>
+                          <button
+                            className="btn btn-light btn-sm px-3"
+                            style={{ borderRadius: 8 }}
+                            onClick={() => { setEditingId(null); setEditPrice(""); }}
+                            disabled={editSaving}
+                          >
                             <i className="fa-solid fa-xmark" />
                           </button>
                         </div>
@@ -257,7 +485,8 @@ const InvoiceSection = ({ requestId, toast }) => {
                             className="btn btn-outline-primary btn-sm"
                             style={{ borderRadius: 8, width: 32, height: 32, padding: 0 }}
                             title="Edit price"
-                            onClick={() => { setEditingId(detailId); setEditPrice(String(item.price ?? item.unitPrice ?? "")); }}
+                            disabled={isDeleting}
+                            onClick={() => { setEditingId(invoiceDetailId); setEditPrice(String(item.price)); }}
                           >
                             <i className="fa-solid fa-pen fa-xs" />
                           </button>
@@ -265,9 +494,12 @@ const InvoiceSection = ({ requestId, toast }) => {
                             className="btn btn-outline-danger btn-sm"
                             style={{ borderRadius: 8, width: 32, height: 32, padding: 0 }}
                             title="Delete item"
-                            onClick={() => handleDelete(detailId)}
+                            disabled={isDeleting}
+                            onClick={() => handleDelete(invoiceDetailId)}
                           >
-                            <i className="fa-solid fa-trash fa-xs" />
+                            {isDeleting
+                              ? <span className="spinner-border spinner-border-sm" style={{ width: 12, height: 12 }} />
+                              : <i className="fa-solid fa-trash fa-xs" />}
                           </button>
                         </div>
                       )}
@@ -279,30 +511,14 @@ const InvoiceSection = ({ requestId, toast }) => {
           </tbody>
         </table>
       </div>
-
-      {/* ── Totals ── */}
-      <div className="px-4 py-4" style={{ background: "#f8fafc", borderTop: "1px solid #e2e8f0" }}>
-        <div className="ms-auto" style={{ maxWidth: 300 }}>
-          <div className="d-flex justify-content-between mb-2 text-muted small">
-            <span>Subtotal</span><span>{fmt(subtotal)} EGP</span>
-          </div>
-          <div className="d-flex justify-content-between mb-3 text-muted small">
-            <span>VAT (14%)</span><span>{fmt(tax)} EGP</span>
-          </div>
-          <div className="d-flex justify-content-between fw-bold"
-            style={{ fontSize: "1.05rem", borderTop: "2px solid #cbd5e1", paddingTop: 12 }}>
-            <span>Total</span>
-            <span className="text-primary">{fmt(total)} EGP</span>
-          </div>
-        </div>
-      </div>
+      <InvoiceTotals items={items} />
     </div>
   );
 };
 
-/* ─────────────────────────────────────────────
-   Request Details View
-───────────────────────────────────────────── */
+// ─────────────────────────────────────────────
+//  Request Details View
+// ─────────────────────────────────────────────
 const RequestDetails = ({ requestId, onBack, toast }) => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -321,12 +537,14 @@ const RequestDetails = ({ requestId, onBack, toast }) => {
 
   useEffect(() => { fetchDetails(); }, [fetchDetails]);
 
-  const currentStep = STATUS_TO_STEP[details?.status] ?? 0;
-  const isTerminal = details?.status === 5 || details?.status === 6;
+  /*Progress bar*/
+  const numericStatus = normaliseStatus(details?.status);
+  const currentStep   = STATUS_TO_STEP[numericStatus] ?? 0;
+  const isTerminal    = numericStatus === 5 || numericStatus === 6;
 
   const handleUpdateStatus = async () => {
     if (!details || isTerminal) return;
-    const nextStatus = (details.status ?? 1) + 1;
+    const nextStatus = (numericStatus ?? 1) + 1;
     try {
       await api.patch("/EmergencyRequests/UpdateEmergencyStatus", {
         requestId: details.requestId,
@@ -336,7 +554,7 @@ const RequestDetails = ({ requestId, onBack, toast }) => {
       fetchDetails();
     } catch {
       toast.push("Failed to update status", "danger");
-    } 
+    }
   };
 
   if (loading) return (
@@ -358,25 +576,37 @@ const RequestDetails = ({ requestId, onBack, toast }) => {
     </div>
   );
 
-  // Build Google Maps URL from coords or fallback
-  const lat = details.latitude ?? details.lat;
-  const lng = details.longitude ?? details.lng;
-  const locationURL = lat && lng
-    ? `https://www.google.com/maps?q=${lat},${lng}`
-    : (details.locationUrl ?? null);
+  /*Location link:*/
+  const locationURL =
+    details.locationURL ??         // exact key from the API response image
+    details.locationUrl ??
+    details.locationurl ??
+    (() => {
+      const lat = details.latitude ?? details.lat;
+      const lng = details.longitude ?? details.lng;
+      return lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : null;
+    })();
 
+  /*Complete data display:*/
   const infoFields = [
-    { icon: "fa-user",                  label: "Customer Name",       value: details.clientName },
-    { icon: "fa-car",                   label: "Vehicle Details",      value: details.vehicleDetails },
-    { icon: "fa-triangle-exclamation",  label: "Emergency Type",       value: details.requestType },
-    { icon: "fa-clock",                 label: "Est. Response Time",
+    { icon: "fa-hashtag",              label: "Request ID",           value: `REQ-${details.requestId}` },
+    { icon: "fa-user",                 label: "Customer Name",        value: details.clientName },
+    { icon: "fa-phone",                label: "Customer Phone",       value: details.clientPhone ?? details.phoneNumber },
+    { icon: "fa-car",                  label: "Vehicle Details",      value: details.vehicleDetails },
+    { icon: "fa-triangle-exclamation", label: "Emergency Type",       value: details.requestType },
+    { icon: "fa-calendar-days",        label: "Created At",
+      value: details.createdAt
+        ? new Date(details.createdAt).toLocaleString("en-EG", { dateStyle: "medium", timeStyle: "short" })
+        : null },
+    { icon: "fa-road",                 label: "Est. Distance",
+      value: details.estimatedDistance != null ? `${details.estimatedDistance} km` : null },
+    { icon: "fa-clock",                label: "Est. Response Time",
       value: details.estimatedTimeInMinutes ? `${details.estimatedTimeInMinutes} min` : null },
-    { icon: "fa-phone",                 label: "Phone Number",
-      value: details.phoneNumber ?? details.clientPhone },
-    { icon: "fa-user-gear",             label: "Technician",
-      value: details.technicianName ?? "Unassigned" },
-    { icon: "fa-note-sticky",           label: "Notes",
-      value: details.notes ?? details.description },
+    { icon: "fa-user-gear",            label: "Technician",           value: details.technicianName ?? "Unassigned" },
+    { icon: "fa-id-badge",             label: "Technician ID",
+      value: details.technicianId != null ? `#${details.technicianId}` : null },
+    { icon: "fa-phone-volume",         label: "Technician Phone",     value: details.technicianPhone },
+    { icon: "fa-note-sticky",          label: "Notes",                value: details.notes ?? details.description },
   ];
 
   return (
@@ -401,90 +631,127 @@ const RequestDetails = ({ requestId, onBack, toast }) => {
               : "—"}
           </p>
         </div>
+        {/* BUG #2 FIX: StatusBadge now normalises the string status correctly */}
         <StatusBadge status={details.status} />
       </div>
 
       {/* ── Progress Timeline ── */}
-      
       <div className="card border-0 shadow-sm rounded-4 p-4 mb-4">
         <h4 className="fw-bold mb-4">Request Progress</h4>
 
-        {/* Timeline */}
+        {/* BUG #4 FIX: currentStep is derived from normalised numeric status, synced on mount */}
         <div className="d-flex justify-content-between position-relative mb-5">
-          <div className="position-absolute top-50 start-0 end-0 translate-middle-y" style={{ height: "2px", background: "#e0e0e0", zIndex: 0 }}></div>
-          <div className="position-absolute top-50 start-0 translate-middle-y"
-            style={{ height: "2px", background: "#0d6efd", zIndex: 0, width: `${(currentStep / (steps.length - 1)) * 100}%`, transition: "0.3s" }}>
-          </div>
-
+          <div
+            className="position-absolute top-50 start-0 end-0 translate-middle-y"
+            style={{ height: "2px", background: "#e0e0e0", zIndex: 0 }}
+          />
+          <div
+            className="position-absolute top-50 start-0 translate-middle-y"
+            style={{
+              height: "2px",
+              background: "#0d6efd",
+              zIndex: 0,
+              width: `${(currentStep / (steps.length - 1)) * 100}%`,
+              transition: "width 0.4s ease",
+            }}
+          />
           {steps.map((s, index) => (
             <div key={index} className="text-center position-relative" style={{ zIndex: 1 }}>
-              <div className={`rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2`}
+              <div
+                className="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2"
                 style={{
-                  width: "30px", height: "30px",
+                  width: 34, height: 34,
                   background: index <= currentStep ? "#0d6efd" : "#fff",
                   border: `2px solid ${index <= currentStep ? "#0d6efd" : "#e0e0e0"}`,
-                  color: index <= currentStep ? "#fff" : "#000",
-                  fontSize: "12px",
+                  color: index <= currentStep ? "#fff" : "#adb5bd",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  boxShadow: index === currentStep ? "0 0 0 4px rgba(13,110,253,.15)" : "none",
+                  transition: "all 0.3s ease",
                 }}
               >
-                {index < currentStep ? "✓" : index + 1}
+                {index < currentStep ? <i className="fa-solid fa-check" style={{ fontSize: 11 }} /> : index + 1}
               </div>
               <small className={`fw-bold ${index <= currentStep ? "text-primary" : "text-muted"}`}>{s}</small>
             </div>
           ))}
         </div>
 
-        {currentStep < steps.length - 1 && (
-          <button className="btn btn-primary d-block mx-auto px-5" onClick={handleUpdateStatus}>
-            Update Status to: <strong>{steps[currentStep + 1]}</strong>
+        {!isTerminal && currentStep < steps.length - 1 && (
+          <button
+            className="btn btn-primary d-block mx-auto px-5 fw-semibold"
+            style={{ borderRadius: 10 }}
+            onClick={handleUpdateStatus}
+          >
+            <i className="fa-solid fa-circle-arrow-right me-2" />
+            Update to: <strong>{steps[currentStep + 1]}</strong>
           </button>
+        )}
+        {isTerminal && (
+          <div className="text-center">
+            <span
+              className={`badge px-4 py-2 fw-semibold ${numericStatus === 5 ? "bg-success" : "bg-danger"}`}
+              style={{ borderRadius: 20, fontSize: "0.85rem" }}
+            >
+              <i className={`fa-solid fa-${numericStatus === 5 ? "circle-check" : "ban"} me-1`} />
+              {numericStatus === 5 ? "Request Completed" : "Request Cancelled"}
+            </span>
+          </div>
         )}
       </div>
 
-      {/* ── Request Info Grid ── */}
-      <div className="card border-0 shadow-sm rounded-4 p-4 mb-0">
-        <h5 className="fw-bold mb-4">Request Information</h5>
+      {/* ── Request Info Grid (BUG #5 FIX — all fields) ── */}
+      <div className="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <h5 className="fw-bold mb-4">
+          <i className="fa-solid fa-circle-info text-primary me-2" style={{ fontSize: "1rem" }} />
+          Request Information
+        </h5>
         <div className="row g-4">
-          {infoFields.map(({ icon, label, value }) => (
-            <div key={label} className="col-md-4 col-sm-6">
-              <div className="d-flex align-items-start gap-3">
-                <div className="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                  style={{ width: 38, height: 38, background: "rgba(37,99,235,.08)" }}>
-                  <i className={`fa-solid ${icon} text-primary`} style={{ fontSize: "0.82rem" }} />
-                </div>
-                <div>
-                  <p className="text-muted small mb-0 fw-medium">{label}</p>
-                  <p className="fw-semibold mb-0" style={{ fontSize: "0.9rem" }}>{value ?? "—"}</p>
+          {infoFields
+            .filter(f => f.value != null && f.value !== "" && f.value !== "—")
+            .map(({ icon, label, value }) => (
+              <div key={label} className="col-md-4 col-sm-6">
+                <div className="d-flex align-items-start gap-3">
+                  <div
+                    className="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                    style={{ width: 38, height: 38, background: "rgba(37,99,235,.08)" }}
+                  >
+                    <i className={`fa-solid ${icon} text-primary`} style={{ fontSize: "0.82rem" }} />
+                  </div>
+                  <div>
+                    <p className="text-muted small mb-0 fw-medium">{label}</p>
+                    <p className="fw-semibold mb-0" style={{ fontSize: "0.9rem" }}>{value}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
 
-          {/* Location — spans full width */}
-          <div className="col-12">
+          {/* ── Location field (BUG #3 FIX) ── */}
+          <div className="col-md-4 col-sm-6">
             <div className="d-flex align-items-start gap-3">
-              <div className="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                style={{ width: 38, height: 38, background: "rgba(239,68,68,.08)" }}>
-                <i className="fa-solid fa-location-dot text-danger" style={{ fontSize: "0.82rem" }} />
+              <div
+                className="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                style={{ width: 38, height: 38, background: "rgba(239,68,68,.08)" }}
+              >
+                <i className="fa-solid fa-map-location-dot text-danger" style={{ fontSize: "0.82rem" }} />
               </div>
               <div>
                 <p className="text-muted small mb-0 fw-medium">Location</p>
-                <p className="fw-semibold mb-1" style={{ fontSize: "0.9rem" }}>
-                  {details.manualAddress ?? "—"}
-                </p>
                 {locationURL ? (
                   <a
                     href={locationURL}
                     target="_blank"
                     rel="noreferrer"
-                    className="btn btn-sm btn-outline-danger"
-                    style={{ borderRadius: 8, fontSize: "0.78rem" }}
+                    className="btn btn-sm btn-outline-danger mt-1 d-inline-flex align-items-center gap-1 fw-semibold"
+                    style={{ borderRadius: 8, fontSize: "0.8rem" }}
                   >
-                    <i className="fa-solid fa-location-arrow me-1" />
-                    Open in Google Maps
+                    <i className="fa-solid fa-map-location-dot" />
+                    Open Map
                   </a>
                 ) : (
-                  <span className="text-muted small">No GPS coordinates available</span>
+                  <p className="fw-semibold mb-0 text-muted" style={{ fontSize: "0.9rem" }}>
+                    {details.manualAddress ?? "No location available"}
+                  </p>
                 )}
               </div>
             </div>
@@ -492,31 +759,39 @@ const RequestDetails = ({ requestId, onBack, toast }) => {
         </div>
       </div>
 
-      {/* ── Invoice ── */}
-      <InvoiceSection requestId={requestId} toast={toast} />
+      {/*
+        ── Invoice (BUG #6 PRESERVED) ──
+        Status 2–4 (Accepted / On the way / Arrived) → editable invoice
+        Status 5  (Completed)                        → read-only invoice
+        Status 1 or 6 (Pending / Cancelled)          → nothing shown
+      */}
+      {numericStatus >= 2 && numericStatus <= 4 && (
+        <InvoiceEditSection requestId={requestId} toast={toast} />
+      )}
+      {numericStatus === 5 && (
+        <InvoiceViewSection requestId={requestId} />
+      )}
     </div>
   );
 };
 
-/* ─────────────────────────────────────────────
-   Main — AllRequests (List)
-───────────────────────────────────────────── */
+// ─────────────────────────────────────────────
+//  Main — AllRequests (List)
+// ─────────────────────────────────────────────
 const AllRequests = () => {
   const toast = useToast();
-  const [view, setView] = useState("list");
+  const [view,       setView]       = useState("list");
   const [selectedId, setSelectedId] = useState(null);
-
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
-
+  const [requests,   setRequests]   = useState([]);
+  const [loading,    setLoading]    = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [dateFilter, setDateFilter] = useState("all");
+  const [dateFilter,   setDateFilter]   = useState("all");
 
   const fetchAllRequests = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get("/EmergencyRequests/Provider/MyRequests");
+      const res  = await api.get("/EmergencyRequests/Provider/MyRequests");
       const data = res.data?.data || res.data || [];
       setRequests(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -529,13 +804,18 @@ const AllRequests = () => {
 
   useEffect(() => { fetchAllRequests(); }, [fetchAllRequests]);
 
-  // ── Memoised filtering ───────────────────────
+  /**
+   * BUG #1 FIX — Status filter type mismatch:
+   * req.status may be a string like "Accepted". We normalise it to a number
+   * before comparing against parseInt(statusFilter) so the filter actually works.
+   */
   const filteredRequests = useMemo(() => {
-    const now = Date.now();
+    const now  = Date.now();
     const term = searchTerm.toLowerCase().trim();
-    const DAY = 86_400_000;
+    const DAY  = 86_400_000;
 
     return requests.filter(req => {
+      // Text search
       if (term && !(
         req.requestId?.toString().includes(term) ||
         req.clientName?.toLowerCase().includes(term) ||
@@ -543,20 +823,25 @@ const AllRequests = () => {
         (req.manualAddress ?? "").toLowerCase().includes(term)
       )) return false;
 
-      if (statusFilter !== "All" && req.status !== parseInt(statusFilter)) return false;
+      // Status filter — normalise to number before comparing (BUG #1 FIX)
+      if (statusFilter !== "All") {
+        const reqStatusNum = normaliseStatus(req.status);
+        if (reqStatusNum !== parseInt(statusFilter, 10)) return false;
+      }
 
+      // Date filter
       if (dateFilter !== "all" && req.createdAt) {
         const diff = now - new Date(req.createdAt).getTime();
-        if (dateFilter === "day"   && diff > DAY)       return false;
-        if (dateFilter === "week"  && diff > 7  * DAY)  return false;
-        if (dateFilter === "month" && diff > 30 * DAY)  return false;
+        if (dateFilter === "day"   && diff > DAY)      return false;
+        if (dateFilter === "week"  && diff > 7  * DAY) return false;
+        if (dateFilter === "month" && diff > 30 * DAY) return false;
       }
 
       return true;
     });
   }, [requests, searchTerm, statusFilter, dateFilter]);
 
-  // ── Details view ─────────────────────────────
+  // ── Details view ──
   if (view === "details") {
     return (
       <>
@@ -570,7 +855,7 @@ const AllRequests = () => {
     );
   }
 
-  // ── List view ─────────────────────────────────
+  // ── List view ──
   return (
     <>
       <Toast toasts={toast.toasts} />
@@ -632,9 +917,9 @@ const AllRequests = () => {
               <div className="col-lg-3">
                 <div className="d-flex gap-1 p-1 rounded-3" style={{ background: "#f1f5f9" }}>
                   {[
-                    { key: "all", label: "All" },
-                    { key: "day", label: "Today" },
-                    { key: "week", label: "Week" },
+                    { key: "all",   label: "All"   },
+                    { key: "day",   label: "Today" },
+                    { key: "week",  label: "Week"  },
                     { key: "month", label: "Month" },
                   ].map(({ key, label }) => (
                     <button
@@ -643,8 +928,8 @@ const AllRequests = () => {
                       style={{
                         borderRadius: 8, fontSize: "0.78rem", fontWeight: 600, border: "none",
                         background: dateFilter === key ? "#fff" : "transparent",
-                        color: dateFilter === key ? "#1e293b" : "#94a3b8",
-                        boxShadow: dateFilter === key ? "0 1px 4px rgba(0,0,0,.08)" : "none",
+                        color:      dateFilter === key ? "#1e293b" : "#94a3b8",
+                        boxShadow:  dateFilter === key ? "0 1px 4px rgba(0,0,0,.08)" : "none",
                         transition: "all .2s",
                       }}
                       onClick={() => setDateFilter(key)}
@@ -672,8 +957,13 @@ const AllRequests = () => {
               <thead style={{ background: "#f8fafc" }}>
                 <tr>
                   {["Request ID", "Customer & Car", "Emergency Type", "Location", "Status", "Technician", "Time", "Action"].map(h => (
-                    <th key={h} className="px-4 py-3 small fw-semibold text-muted"
-                      style={{ border: "none", whiteSpace: "nowrap" }}>{h}</th>
+                    <th
+                      key={h}
+                      className="px-4 py-3 small fw-semibold text-muted"
+                      style={{ border: "none", whiteSpace: "nowrap" }}
+                    >
+                      {h}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -697,9 +987,18 @@ const AllRequests = () => {
                   </tr>
                 ) : (
                   filteredRequests.map(req => {
-                    const lat = req.latitude ?? req.lat;
-                    const lng = req.longitude ?? req.lng;
-                    const mapUrl = lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : null;
+                    /**
+                     * BUG #3 FIX (table row) — use locationURL from API directly.
+                     * Falls back to lat/lng only if locationURL is absent.
+                     */
+                    const rowLocationURL =
+                      req.locationURL ??
+                      req.locationUrl ??
+                      (() => {
+                        const lat = req.latitude ?? req.lat;
+                        const lng = req.longitude ?? req.lng;
+                        return lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : null;
+                      })();
 
                     return (
                       <tr key={req.requestId}>
@@ -712,19 +1011,20 @@ const AllRequests = () => {
                         </td>
                         <td className="px-4 py-3">{req.requestType ?? "—"}</td>
                         <td className="px-4 py-3">
-                          {mapUrl ? (
+                          {rowLocationURL ? (
                             <a
-                              href={mapUrl}
+                              href={rowLocationURL}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-primary small fw-medium text-decoration-none d-flex align-items-center gap-1"
+                              className="text-danger small fw-semibold text-decoration-none d-inline-flex align-items-center gap-1"
                             >
-                              <i className="fa-solid fa-location-dot" /> Open Location
+                              <i className="fa-solid fa-map-location-dot" /> Open Map
                             </a>
                           ) : (
                             <span className="text-muted small">{req.manualAddress ?? "—"}</span>
                           )}
                         </td>
+                        {/* BUG #2 FIX: StatusBadge normalises string → number */}
                         <td className="px-4 py-3">
                           <StatusBadge status={req.status} />
                         </td>

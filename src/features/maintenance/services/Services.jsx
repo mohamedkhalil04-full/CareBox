@@ -247,8 +247,8 @@ const MaintenanceServices = () => {
                                         <option value="">Select existing category</option>
 
                                         {categories.map((cat) => {
-                                            const catName = cat.categoryName || cat.name || cat;
-                                            const catValue = cat.categoryName || cat.name || cat;
+                                            const catName = cat.categoryName;
+                                            const catValue = cat.categoryName;
 
                                             return (
                                                 <option key={cat.categoryId || catName} value={catValue}>
