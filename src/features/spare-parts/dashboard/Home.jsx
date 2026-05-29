@@ -76,7 +76,7 @@ const STATUS_COLORS = {
   Accepted: "#3b82f6",
   Pending: "#f59e0b",
   Preparing: "#6366f1",
-  OutForDelivery: "#f97316",
+  OutForDelivery: "#1e1c1c",
   ReadyForPickup: "#14b8a6",
   Cancelled: "#ef4444",
 };
@@ -95,10 +95,10 @@ const STATUS_BADGE = {
   Pending: "warning text-dark",
   Accepted: "primary",
   Preparing: "secondary",
-  OutForDelivery: "danger",
+  OutForDelivery: "dark",
   ReadyForPickup: "info text-dark",
   Completed: "success",
-  Cancelled: "dark",
+  Cancelled: "danger",
 };
 
 /* ─────────────────────────────────────────────

@@ -242,6 +242,29 @@ const STATUS_MAP = {
   6: { label: "Cancelled",  variant: "danger",   textDark: false },
 };
 
+// The API returns status as a string ("Arrived", "Pending", etc.).
+// This map converts those strings to the numeric keys used by STATUS_MAP.
+const STATUS_LABEL_TO_NUM = {
+  pending:      1,
+  accepted:     2,
+  "on the way": 3,
+  ontheway:     3,
+  arrived:      4,
+  completed:    5,
+  cancelled:    6,
+};
+
+/**
+ * Accepts a string ("Arrived") OR a number (4) and always returns
+ * the numeric key for STATUS_MAP. Returns null if unrecognised.
+ */
+const normaliseStatus = (raw) => {
+  if (raw == null) return null;
+  const n = Number(raw);
+  if (!isNaN(n) && n > 0) return n;
+  return STATUS_LABEL_TO_NUM[String(raw).toLowerCase().replace(/\s+/g, " ").trim()] ?? null;
+};
+
 const EMERGENCY_TYPE_COLORS = {
   "Flat Tire":     { bg: "#fff7ed", color: "#c2410c" },
   "Dead Battery":  { bg: "#fef9c3", color: "#a16207" },
@@ -290,9 +313,10 @@ const StatCard = ({ icon, iconBg, iconColor, label, value, badge, badgeIcon, bad
   </div>
 );
 
-/** Status Badge */
+/** Status Badge — normalises string or numeric status to the correct colour */
 const StatusBadge = ({ status }) => {
-  const s = STATUS_MAP[status] || { label: String(status), variant: "secondary", textDark: false };
+  const key = normaliseStatus(status);
+  const s   = STATUS_MAP[key] ?? { label: String(status ?? "Unknown"), variant: "secondary", textDark: false };
   return (
     <span className={`badge bg-${s.variant}${s.textDark ? " text-dark" : ""} px-3 py-2`}
       style={{ borderRadius: 20, fontSize: "0.75rem" }}>
@@ -314,8 +338,9 @@ const TypePill = ({ type }) => {
 
 /** Active Emergency Card (right panel) */
 const ActiveEmergencyCard = ({ req }) => {
-  const isCompleted = req.status === 5;
-  const isOnTheWay  = req.status === 3;
+  const numStatus   = normaliseStatus(req.status);
+  const isCompleted = numStatus === 5;
+  const isOnTheWay  = numStatus === 3;
   // const typeStyle   = EMERGENCY_TYPE_COLORS[req.requestType] || DEFAULT_TYPE_STYLE;
 
   return (
@@ -330,10 +355,6 @@ const ActiveEmergencyCard = ({ req }) => {
         </small>
       </div>
       <h6 className="fw-bold mb-1">{req.vehicleDetails || "Vehicle"}</h6>
-      <p className="text-muted small mb-2">
-        <i className="fa-solid fa-location-dot me-1 text-danger opacity-75" style={{ fontSize: "0.7rem" }} />
-        {req.manualAddress || "Location unavailable"}
-      </p>
       {isOnTheWay && (
         <div className="d-flex align-items-center gap-2 text-primary small fw-semibold">
           <span className="rounded-circle"
@@ -349,9 +370,9 @@ const ActiveEmergencyCard = ({ req }) => {
       )}
       {!isOnTheWay && !isCompleted && (
         <div className="d-flex align-items-center gap-2 small fw-semibold"
-          style={{ color: STATUS_MAP[req.status]?.variant === "warning" ? "#d97706" : "#6366f1" }}>
+          style={{ color: STATUS_MAP[numStatus]?.variant === "warning" ? "#d97706" : "#6366f1" }}>
           <i className="fa-solid fa-circle-dot" />
-          {STATUS_MAP[req.status]?.label || "Active"}
+          {STATUS_MAP[numStatus]?.label || "Active"}
         </div>
       )}
     </div>
@@ -378,8 +399,12 @@ const EmergencyDashboard = () => {
 
   const [requests, setRequests] = useState([]);
 
-  // Derived: active emergencies for right panel (status 1–4)
-  const activeEmergencies = requests.filter(r => r.status >= 1 && r.status <= 4);
+  // Derived: active emergencies for right panel (statuses 1–4: Pending/Accepted/On the way/Arrived).
+  // normaliseStatus handles the API returning strings like "Arrived" instead of numbers.
+  const activeEmergencies = requests.filter(r => {
+    const n = normaliseStatus(r.status);
+    return n !== null && n >= 1 && n <= 4;
+  });
   // Recent: last 5 for table
   const recentRequests = requests.slice(0, 5);
 
@@ -426,10 +451,10 @@ const EmergencyDashboard = () => {
 
   // ── Render ──────────────────────────────────
   return (
-    <div className="container-fluid p-4 bg-light min-vh-100">
+    <div className="container-fluid bg-light min-vh-100">
 
       {/* ── Header ── */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="d-flex justify-content-between align-items-center mb-2">
         <h1 className="fw-bold font-monospace fst-italic mb-0">
           Dashboard Overview:
         </h1>

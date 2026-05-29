@@ -232,7 +232,7 @@ const MaintenanceServices = () => {
                                     onChange={handleChange}
                                     className="form-control"
                                     placeholder="Describe what the service includes..."
-                                    rows="3"
+                                    rows="2"
                                 ></textarea>
                             </div>
                             {/* With Category Section */}
