@@ -10,7 +10,6 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // فحص صارم زي اللي عملناه في الرئيسية
     const token = localStorage.getItem("token");
     const isAuthenticated = token && token !== "null" && token !== "undefined";
     
@@ -27,7 +26,6 @@ const Login = () => {
 
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("isLoggedIn", "true");
-      // localStorage.setItem("userRole", response.data.providerTypeId); // دي عشان نوع المستخدم
       if (response.data.providerType) {
         localStorage.setItem("providerType", response.data.providerType);
       }
