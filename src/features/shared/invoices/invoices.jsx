@@ -1,4 +1,3 @@
-// invoices
 import React, { useState, useEffect } from "react";
 import api from "../../../api/axiosInstance";
 import LoadingStyle from "../../../utils/loadingStyle";

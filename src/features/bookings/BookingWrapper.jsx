@@ -1,6 +1,4 @@
-// src/features/bookings/BookingWrapper.jsx
 import { useProviderType } from '../../hooks/useProviderType';
-
 import CarCareBookings from '../car-care/bookings/Bookings';
 import MaintenanceBookings from '../maintenance/bookings/Bookings';
 import SparePartsBookings from '../spare-parts/orders/orders';

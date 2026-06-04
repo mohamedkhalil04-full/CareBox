@@ -34,13 +34,7 @@ export const getSidebarItems = (providerType) => {
       path: "/about", 
       label: "About Us", 
       icon: "fa-solid fa-award" 
-    },
-    // { 
-    //   path: "/settings", 
-    //   label: "Settings", 
-    //   icon: "fa-solid fa-gear" 
-    // },
-    
+    }
   ];
   switch (providerType) {
     case PROVIDER_TYPES.CAR_CARE:        // مغسلة 
@@ -48,7 +42,7 @@ export const getSidebarItems = (providerType) => {
         ...commonItems.slice(0, 1), // Home
         { path: "/bookings", label: "Bookings", icon: "fa-regular fa-calendar" },
         { path: "/services", label: "Services", icon: "fa-solid fa-wrench" },
-        ...commonItems.slice(1), // Profile, Settings, About
+        ...commonItems.slice(1),
       ];
 
     case PROVIDER_TYPES.MAINTENANCE:     // صيانة
@@ -73,7 +67,6 @@ export const getSidebarItems = (providerType) => {
         { path: "/", label: "Dashboard", icon: "fa-solid fa-chart-bar" },
         { path: "/EmergencyRequests", label: "Emergency Requests", icon: "fa-solid fa-triangle-exclamation" },
         { path: "/allRequests", label: "All Requests", icon: "fa-solid fa-clipboard-list"},
-        // { path: "/Notifications", label: "Notifications", icon: "fa-solid fa-truck-medical"},
         { path: "/MyTech", label: "MyTech", icon: "fa-solid fa-address-book"},
         { path: "/Reports", label: "Reports", icon: "fa-solid fa-chart-line"},
         ...commonItems.slice(1).splice(1),

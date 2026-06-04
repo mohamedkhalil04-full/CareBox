@@ -58,47 +58,6 @@ const About = () => {
       }));
     };
 
-  // const handleSave = async () => {
-  //   setSaving(true);
-  //   setMessage({ type: "", text: "" });
-
-  //   const formData = new FormData();
-  //   formData.append("Description", newDescription || "");
-
-  //   newImages.forEach(file => formData.append("NewImages", file));
-
-  //   if (imagesToDelete.length > 0) {
-  //     formData.append("ImagesToDeleteIds", imagesToDelete.join(","));
-  //   }
-
-  //   try {
-  //     await api.put("/ProviderProfile/About", formData, {
-  //       headers: { "Content-Type": "multipart/form-data" },
-  //     });
-
-  //     const res = await api.get("/ProviderProfile/About");
-  //     const data = res.data?.data || res.data || {};
-
-  //     setAboutData({
-  //       description: data.description || "",
-  //       images: Array.isArray(data.images) ? data.images : [],
-  //     });
-
-  //     setNewDescription(data.description || "");
-  //     setNewImages([]);
-  //     setPreviewImages([]);
-  //     setImagesToDelete([]);
-  //     setIsEditing(false);
-
-  //     setMessage({ type: "success", text: "About Us updated successfully!" });
-  //   } catch (err) {
-  //     console.error(err);
-  //     setMessage({ type: "danger", text: "Failed to update About Us" });
-  //   } finally {
-  //     setSaving(false);
-  //   }
-  // };
-
   const handleSave = async () => {
   setSaving(true);
   setMessage({ type: "", text: "" });

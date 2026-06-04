@@ -97,10 +97,6 @@ const MaintenanceHome = () => {
       const res = await api.get("/Dashboard/ProviderDashboard/TodayBookings");
       let data = res.data?.data || res.data || [];
       setTodayBookings(Array.isArray(data) ? data : []);
-      // setLoadingBookings(true);
-      // const res = await api.get("/Bookings/ProviderBookings");
-      // let data = res.data?.data || res.data || [];
-      // if (!Array.isArray(data)) data = [];
       const latest = data.slice(0, 5);
       setTodayBookings(latest);
     } catch (err) {
@@ -108,7 +104,6 @@ const MaintenanceHome = () => {
       setTodayBookings([]);
     } finally {
       setLoadingTodayBookings(false);
-      // setLoadingBookings(false);
     }
   };
   useEffect(() => {
@@ -136,7 +131,6 @@ const MaintenanceHome = () => {
   return (
     <div className="p-4">
       <div className="container mt-1">
-                {/* Revenue Overview - الجزء العلوي الكبير (محسن) */}
         <div className="card p-4 mb-4 shadow-sm">
           <h5 className="mb-3">Revenue Overview</h5>
           
@@ -146,7 +140,7 @@ const MaintenanceHome = () => {
               <p className="mt-3">Loading revenue data...</p>
             </div>
           ) : monthlyEarnings.length > 0 ? (
-            <div style={{ height: "320px" }}>   {/* ← قللنا الارتفاع هنا */}
+            <div style={{ height: "320px" }}>
               <Bar 
                 data={revenueData} 
                 options={{

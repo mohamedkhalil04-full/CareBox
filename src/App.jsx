@@ -51,7 +51,6 @@ function App() {
             <Route path="/reviews" element={<Reviews />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/about" element={<About />} />
-            {/* <Route path="/settings" element={<Settings />} /> */}
             
             {/* only spare parts */}
             <Route path="/inventory" element={<Inventory />} />
@@ -59,7 +58,6 @@ function App() {
             {/* only emergency */}
             <Route path="/allRequests" element={<AllRequests/>}/>
             <Route path="/EmergencyRequests" element={<EmergencyRequests/>}/>
-            {/* <Route path="/Notifications" element={<Notifications/>}/> */}
             <Route path="/MyTech" element={<MyTech/>}/>
             <Route path="/Reports" element={<Reports/>}/>
           </Route>

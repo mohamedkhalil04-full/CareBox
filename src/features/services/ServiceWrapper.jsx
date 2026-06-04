@@ -1,6 +1,4 @@
-// src/features/services/ServiceWrapper.jsx
 import { useProviderType } from '../../hooks/useProviderType';
-
 import CarCareServices from '../car-care/services/Services';
 import MaintenanceServices from '../maintenance/services/Services';
 import SparePartsProducts from '../spare-parts/products/Products';   // قطع الغيار

@@ -61,20 +61,6 @@ export default function Location() {
         isInvalid={!!errors.location}
       />
       <label htmlFor="locationInput">Google Maps URL</label>
-      
-      {/* عرض الإحداثيات للمستخدم (اختياري) عشان يتطمن إن السيستم قرأها
-      <div className="d-flex gap-2 mt-2">
-         {watch('latitude') && (
-           <small className="badge bg-light text-dark border">
-             Lat: {watch('latitude')}
-           </small>
-         )}
-         {watch('longitude') && (
-           <small className="badge bg-light text-dark border">
-             Long: {watch('longitude')}
-           </small>
-         )}
-      </div> */}
 
       {errors.location && (
         <FormText className="text-danger">
