@@ -255,9 +255,9 @@ const SideBar = () => {
         onClick={handleLogout} 
         className="btn w-100 d-flex justify-content-center gap-2"
         style={{
-          backgroundColor: isSpareParts ? "#1e2937" : "#f8f9fa",
-          color: isSpareParts ? "#e2e8f0" : "#dc3545",
-          border: isSpareParts ? "1px solid #475569" : "1px solid #dc3545",
+          backgroundColor: isSpareParts || isEmergency ? "#1e2937" : "#f8f9fa",
+          color: isSpareParts || isEmergency ? "#e2e8f0" : "#dc3545",
+          border: isSpareParts || isEmergency ? "1px solid #475569" : "1px solid #dc3545",
         }}
       >
         <span>🚪</span> Logout
